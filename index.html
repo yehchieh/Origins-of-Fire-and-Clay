@@ -1,341 +1,915 @@
-<!DOCTYPE html>
-<html>
-<head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<script src="./support.js"></script>
-</head>
-<body>
-<x-dc>
-<helmet>
-  <link rel="stylesheet" href="_ds/organic-15a0ad4e-17e6-4ccf-8f4a-5b802ccb33b7/styles.css">
-  <script src="_ds/organic-15a0ad4e-17e6-4ccf-8f4a-5b802ccb33b7/_ds_bundle.js"></script>
-  <style>
-    body{margin:0;background:var(--color-neutral-300);}
-    a{color:var(--color-accent-700);text-decoration:none}
-    a:hover{color:var(--color-accent-800);text-decoration:underline}
-    ::-webkit-scrollbar{display:none}
-  </style>
-</helmet>
+<title>火土之源</title>
 
-<div style="min-height:100vh;display:flex;align-items:center;justify-content:center;padding:48px 24px;background:var(--color-neutral-300)">
-<x-import component-from-global-scope="IOSDevice" from="./ios-frame.jsx" hint-size="402px,874px">
-<div style="height:100%;display:flex;flex-direction:column;background:var(--color-bg);font-family:var(--font-body);color:var(--color-text)">
+<style>
+/* ── Tokens ── */
+:root {
+  --bg:          #0C0A08;
+  --surface:     #161210;
+  --card:        #1E1812;
+  --card-h:      #261F17;
+  --border:      rgba(241,232,216,0.07);
+  --text:        #F1E8D8;
+  --text-dim:    #9A8A7E;
+  --text-faint:  #524840;
 
-  <sc-if value="{{ !inDetail }}" hint-placeholder-val="{{ true }}">
-    <div style="flex-shrink:0;padding:14px 20px 8px;display:flex;align-items:center;justify-content:space-between">
-      <div>
-        <div style="font-family:var(--font-heading);font-size:20px;color:var(--color-text)">火土之源</div>
-        <div style="font-size:11px;color:var(--color-neutral-600);margin-top:2px">{{ appTitleSub }}</div>
-      </div>
-      <div style="display:flex;background:var(--color-neutral-200);border-radius:999px;padding:3px;gap:2px;flex-shrink:0">
-        <button style="{{ langZhStyle }}" onClick="{{ setLangZh }}">中</button>
-        <button style="{{ langEnStyle }}" onClick="{{ setLangEn }}">EN</button>
-      </div>
-    </div>
-  </sc-if>
+  --c-rail:  #5B8BAA;   /* 縱貫鐵道 — steel blue  */
+  --c-oil:   #C09028;   /* 出磺坑 — oil amber      */
+  --c-fire:  #C4521E;   /* 中油探採 — kiln orange  */
+  --c-clay:  #7B8B5A;   /* 苗栗陶 — moss earth     */
 
-  <sc-if value="{{ isExplore }}" hint-placeholder-val="{{ true }}">
-    <div style="flex-shrink:0;padding:4px 20px 10px">
-      <input class="input" type="search" placeholder="{{ searchPlaceholder }}" value="{{ search }}" onChange="{{ onSearch }}" style="font-size:14px;width:100%" />
-    </div>
-    <div style="flex-shrink:0;display:flex;gap:8px;overflow-x:auto;padding:0 20px 12px">
-      <sc-for list="{{ catChips }}" as="c" hint-placeholder-count="5">
-        <button onClick="{{ c.onSelect }}" style="{{ c.chipStyle }}">
-          <span style="width:7px;height:7px;border-radius:50%;background:{{ c.color }};flex-shrink:0"></span>
-          {{ c.label }} ({{ c.count }})
-        </button>
-      </sc-for>
-    </div>
-    <div style="flex:1;overflow:auto;padding:0 20px 20px;display:flex;flex-direction:column;gap:8px">
-      <sc-for list="{{ filtered }}" as="q" hint-placeholder-count="6">
-        <div class="card" onClick="{{ q.onOpen }}" style="cursor:pointer;padding:12px 14px;display:flex;align-items:center;gap:10px;box-shadow:var(--shadow-sm)">
-          <div style="width:4px;align-self:stretch;border-radius:4px;background:{{ q.catColor }};flex-shrink:0"></div>
-          <div style="flex:1;min-width:0">
-            <div style="font-size:10.5px;color:var(--color-neutral-500);margin-bottom:2px;font-variant-numeric:tabular-nums">{{ q.numLabel }} · {{ q.catLabel }}</div>
-            <div style="font-size:14px;font-weight:600;line-height:1.5;color:var(--color-text)">{{ q.primary }}</div>
-          </div>
-          <button onClick="{{ q.onToggleFav }}" style="{{ q.favBtnStyle }}" aria-label="收藏">
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="{{ q.heartFill }}" stroke="currentColor" stroke-width="2.4"><path d="M20.8 4.6c-1.8-1.9-4.9-1.9-6.7 0L12 6.8 9.9 4.6c-1.8-1.9-4.9-1.9-6.7 0-1.9 1.9-1.9 5.1 0 7L12 20l8.8-8.4c1.9-1.9 1.9-5.1 0-7z"/></svg>
-          </button>
-        </div>
-      </sc-for>
-      <sc-if value="{{ noResults }}" hint-placeholder-val="{{ false }}">
-        <div style="text-align:center;padding:48px 12px;color:var(--color-neutral-500);font-size:13px">找不到符合的問題<br>No matching questions</div>
-      </sc-if>
-    </div>
-  </sc-if>
+  --radius:  4px;
+  --ease:    cubic-bezier(.22,.68,0,1.2);
+}
 
-  <sc-if value="{{ isFavorites }}" hint-placeholder-val="{{ false }}">
-    <div style="flex:1;overflow:auto;padding:12px 20px 20px;display:flex;flex-direction:column;gap:8px">
-      <sc-if value="{{ !hasFavorites }}" hint-placeholder-val="{{ false }}">
-        <div style="text-align:center;padding:64px 20px;color:var(--color-neutral-500)">
-          <svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" style="margin:0 auto 10px;display:block;opacity:.5"><path d="M20.8 4.6c-1.8-1.9-4.9-1.9-6.7 0L12 6.8 9.9 4.6c-1.8-1.9-4.9-1.9-6.7 0-1.9 1.9-1.9 5.1 0 7L12 20l8.8-8.4c1.9-1.9 1.9-5.1 0-7z"/></svg>
-          <div style="font-size:13px">尚未收藏任何問題<br>No saved questions yet</div>
-        </div>
-      </sc-if>
-      <sc-for list="{{ favQuestions }}" as="q" hint-placeholder-count="0">
-        <div class="card" onClick="{{ q.onOpen }}" style="cursor:pointer;padding:12px 14px;display:flex;align-items:center;gap:10px;box-shadow:var(--shadow-sm)">
-          <div style="width:4px;align-self:stretch;border-radius:4px;background:{{ q.catColor }};flex-shrink:0"></div>
-          <div style="flex:1;min-width:0">
-            <div style="font-size:10.5px;color:var(--color-neutral-500);margin-bottom:2px">{{ q.numLabel }} · {{ q.catLabel }}</div>
-            <div style="font-size:14px;font-weight:600;line-height:1.5">{{ q.primary }}</div>
-          </div>
-          <button onClick="{{ q.onToggleFav }}" style="{{ q.favBtnStyle }}" aria-label="移除收藏">
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="{{ q.heartFill }}" stroke="currentColor" stroke-width="2.4"><path d="M20.8 4.6c-1.8-1.9-4.9-1.9-6.7 0L12 6.8 9.9 4.6c-1.8-1.9-4.9-1.9-6.7 0-1.9 1.9-1.9 5.1 0 7L12 20l8.8-8.4c1.9-1.9 1.9-5.1 0-7z"/></svg>
-          </button>
-        </div>
-      </sc-for>
-    </div>
-  </sc-if>
-
-  <sc-if value="{{ isMap }}" hint-placeholder-val="{{ false }}">
-    <div style="flex:1;position:relative;margin:6px 20px 10px;border-radius:var(--radius-lg);background:linear-gradient(160deg,var(--color-accent-2-100),var(--color-accent-100));overflow:hidden;box-shadow:var(--shadow-sm)">
-      <div style="position:absolute;inset:0;opacity:.5;background:radial-gradient(circle at 30% 70%,var(--color-accent-2-200) 0%,transparent 55%),radial-gradient(circle at 75% 30%,var(--color-accent-200) 0%,transparent 55%)"></div>
-      <div style="position:absolute;top:10px;left:14px;font-size:11px;color:var(--color-neutral-600);letter-spacing:.05em">{{ mapLabel }}</div>
-      <sc-for list="{{ sites }}" as="s" hint-placeholder-count="6">
-        <button onClick="{{ s.onSelect }}" style="{{ s.pinStyle }}" aria-label="{{ s.label }}">
-          <svg width="20" height="20" viewBox="0 0 24 24" fill="{{ s.color }}" stroke="var(--color-bg)" stroke-width="1.4"><path d="M12 2C7.6 2 4 5.6 4 10c0 6 8 12 8 12s8-6 8-12c0-4.4-3.6-8-8-8z"/><circle cx="12" cy="10" r="3" fill="var(--color-bg)"/></svg>
-        </button>
-      </sc-for>
-      <sc-if value="{{ selectedSite }}" hint-placeholder-val="{{ false }}">
-        <div style="position:absolute;left:12px;right:12px;bottom:12px;background:var(--color-bg);border-radius:var(--radius-md);padding:12px 14px;box-shadow:var(--shadow-md);display:flex;align-items:center;gap:10px">
-          <span style="width:8px;height:8px;border-radius:50%;background:{{ selectedSite.color }};flex-shrink:0"></span>
-          <div style="flex:1;min-width:0">
-            <div style="font-size:10px;color:var(--color-neutral-500)">{{ selectedSiteCatLabel }}</div>
-            <div style="font-size:13.5px;font-weight:600">{{ selectedSite.label }}</div>
-          </div>
-          <button class="btn btn-secondary" onClick="{{ goToCatFromSite }}" style="font-size:11px;padding:6px 10px">查看問題</button>
-        </div>
-      </sc-if>
-    </div>
-    <div style="flex-shrink:0;display:flex;gap:10px;flex-wrap:wrap;padding:0 20px 14px">
-      <sc-for list="{{ legend }}" as="l" hint-placeholder-count="4">
-        <div style="display:flex;align-items:center;gap:5px;font-size:10.5px;color:var(--color-neutral-600)">
-          <span style="width:7px;height:7px;border-radius:50%;background:{{ l.color }}"></span>{{ l.label }}
-        </div>
-      </sc-for>
-    </div>
-  </sc-if>
-
-  <sc-if value="{{ inDetail }}" hint-placeholder-val="{{ false }}">
-    <div style="flex-shrink:0;padding:14px 12px 8px;display:flex;align-items:center;justify-content:space-between">
-      <button class="btn-icon" onClick="{{ closeQ }}" style="width:36px;height:36px;border-radius:50%;background:var(--color-neutral-200);display:flex;align-items:center;justify-content:center">
-        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6"><path d="M15 18l-6-6 6-6"/></svg>
-      </button>
-      <button onClick="{{ selectedQuestion.onToggleFav }}" style="{{ selectedQuestion.favBtnStyle }}" aria-label="收藏">
-        <svg width="18" height="18" viewBox="0 0 24 24" fill="{{ selectedQuestion.heartFill }}" stroke="currentColor" stroke-width="2.4"><path d="M20.8 4.6c-1.8-1.9-4.9-1.9-6.7 0L12 6.8 9.9 4.6c-1.8-1.9-4.9-1.9-6.7 0-1.9 1.9-1.9 5.1 0 7L12 20l8.8-8.4c1.9-1.9 1.9-5.1 0-7z"/></svg>
-      </button>
-    </div>
-    <div style="flex:1;overflow:auto;padding:6px 20px 12px">
-      <span class="tag" style="{{ selectedQuestion.tagStyle }}">{{ selectedQuestion.catLabel }} · {{ selectedQuestion.numLabel }}</span>
-      <div style="font-family:var(--font-heading);font-size:19px;line-height:1.5;margin:14px 0 6px">{{ selectedQuestion.primary }}</div>
-      <div style="font-size:12.5px;color:var(--color-neutral-600);font-style:italic;line-height:1.5;margin-bottom:18px">{{ selectedQuestion.secondary }}</div>
-      <div class="card" style="padding:16px;box-shadow:var(--shadow-sm)">
-        <div class="card-kicker" style="color:var(--color-accent-700)">{{ answerLabel }}</div>
-        <div style="font-size:14.5px;line-height:1.75;margin-top:6px">{{ selectedQuestion.answerPrimary }}</div>
-        <div style="font-size:12px;color:var(--color-neutral-600);font-style:italic;line-height:1.6;margin-top:10px;padding-top:10px;border-top:1px solid var(--color-divider)">{{ selectedQuestion.answerSecondary }}</div>
-      </div>
-    </div>
-    <div style="flex-shrink:0;padding:10px 20px 20px;display:flex;gap:10px">
-      <button class="btn btn-secondary" onClick="{{ selectedQuestion.onCopy }}" style="flex-shrink:0;width:46px;padding:0">
-        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M8 8V5a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v9a2 2 0 0 1-2 2h-3"/><rect x="3" y="8" width="13" height="13" rx="2"/></svg>
-      </button>
-      <a class="btn btn-primary" href="{{ selectedQuestion.chatHref }}" target="_blank" rel="noopener" style="flex:1">
-        {{ askAiLabel }}
-        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><path d="M7 17L17 7M17 7H7M17 7v10"/></svg>
-      </a>
-    </div>
-  </sc-if>
-
-  <sc-if value="{{ !inDetail }}" hint-placeholder-val="{{ true }}">
-    <div style="flex-shrink:0;display:flex;border-top:1px solid var(--color-divider);padding:8px 12px 26px;background:var(--color-bg)">
-      <button onClick="{{ setTabExplore }}" style="flex:1;display:flex;flex-direction:column;align-items:center;gap:3px;background:none;border:none;padding:4px;color:{{ exploreTabColor }}">
-        <svg width="21" height="21" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><path d="M4 6h16M4 12h16M4 18h10"/></svg>
-        <span style="font-size:10px">{{ tabExploreLabel }}</span>
-      </button>
-      <button onClick="{{ setTabMap }}" style="flex:1;display:flex;flex-direction:column;align-items:center;gap:3px;background:none;border:none;padding:4px;color:{{ mapTabColor }}">
-        <svg width="21" height="21" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><path d="M9 20l-6-3V4l6 3 6-3 6 3v13l-6-3-6 3z"/><path d="M9 7v13M15 4v13"/></svg>
-        <span style="font-size:10px">{{ tabMapLabel }}</span>
-      </button>
-      <button onClick="{{ setTabFavorites }}" style="flex:1;display:flex;flex-direction:column;align-items:center;gap:3px;background:none;border:none;padding:4px;color:{{ favTabColor }}">
-        <svg width="21" height="21" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><path d="M20.8 4.6c-1.8-1.9-4.9-1.9-6.7 0L12 6.8 9.9 4.6c-1.8-1.9-4.9-1.9-6.7 0-1.9 1.9-1.9 5.1 0 7L12 20l8.8-8.4c1.9-1.9 1.9-5.1 0-7z"/></svg>
-        <span style="font-size:10px">{{ tabFavLabel }}</span>
-      </button>
-    </div>
-  </sc-if>
-
-  <sc-if value="{{ toast }}" hint-placeholder-val="{{ false }}">
-    <div style="position:absolute;left:50%;bottom:100px;transform:translateX(-50%);background:var(--color-neutral-900);color:var(--color-bg);padding:9px 16px;border-radius:999px;font-size:12px;white-space:nowrap;box-shadow:var(--shadow-md);z-index:80">{{ toast }}</div>
-  </sc-if>
-
-</div>
-</x-import>
-</div>
-</helmet>
-</x-dc>
-<script type="text/x-dc" data-dc-script>
-class Component extends DCLogic {
-  state = {
-    tab: 'explore', lang: 'zh', activeCat: 'all', search: '',
-    selectedQid: null, selectedSite: null, favorites: [],
-    sections: [], sites: [], categories: [], toast: null,
-  };
-
-  componentDidMount() {
-    try {
-      const raw = localStorage.getItem('huotu-app-favs');
-      if (raw) this.state.favorites = JSON.parse(raw);
-    } catch (e) {}
-    import('./data.js').then(m => {
-      let num = 0;
-      const sections = m.SECTIONS.map(sec => ({
-        id: sec.id,
-        questions: sec.questions.map((q, i) => {
-          num++;
-          return { ...q, qid: sec.id + '-' + i, cat: sec.id, num, numLabel: 'Q' + String(num).padStart(2, '0') };
-        }),
-      }));
-      this.setState({ sections, sites: m.SITES, categories: m.CATEGORIES });
-    });
-  }
-
-  chatUrl(zh) { return 'https://chatgpt.com/?q=' + encodeURIComponent(zh); }
-
-  setTab(tab) { this.setState({ tab, selectedQid: null, selectedSite: null }); }
-  setLang(lang) { this.setState({ lang }); }
-  setCat(id) { this.setState({ activeCat: id }); }
-  onSearch(e) { this.setState({ search: e.target.value }); }
-  openQ(qid) { this.setState({ selectedQid: qid }); }
-  closeQ() { this.setState({ selectedQid: null }); }
-  selectSite(site) { this.setState({ selectedSite: site }); }
-  goToCatFromSite() {
-    if (this.state.selectedSite) this.setState({ tab: 'explore', activeCat: this.state.selectedSite.cat, selectedSite: null, selectedQid: null });
-  }
-  toggleFav(qid) {
-    const has = this.state.favorites.includes(qid);
-    const favorites = has ? this.state.favorites.filter(x => x !== qid) : [...this.state.favorites, qid];
-    this.setState({ favorites });
-    try { localStorage.setItem('huotu-app-favs', JSON.stringify(favorites)); } catch (e) {}
-    this.showToast(has ? '已移除收藏' : '已加入收藏');
-  }
-  showToast(msg) {
-    this.setState({ toast: msg });
-    clearTimeout(this._t);
-    this._t = setTimeout(() => this.setState({ toast: null }), 1800);
-  }
-  copyQuestion(q) {
-    const text = q.zh + '\n' + q.en + '\n' + this.chatUrl(q.zh);
-    if (navigator.clipboard) navigator.clipboard.writeText(text).catch(() => {});
-    this.showToast('已複製連結');
-  }
-
-  decorate(q, lang, catObj, favorites) {
-    const isFav = favorites.includes(q.qid);
-    return {
-      ...q,
-      primary: lang === 'zh' ? q.zh : q.en,
-      secondary: lang === 'zh' ? q.en : q.zh,
-      answerPrimary: lang === 'zh' ? q.azh : q.aen,
-      answerSecondary: lang === 'zh' ? q.aen : q.azh,
-      catLabel: lang === 'zh' ? catObj.zh : catObj.en,
-      catColor: catObj.color,
-      chatHref: this.chatUrl(q.zh),
-      heartFill: isFav ? 'currentColor' : 'none',
-      favBtnStyle: 'background:none;border:none;padding:6px;color:' + (isFav ? 'var(--color-accent)' : 'var(--color-neutral-500)') + ';cursor:pointer;flex-shrink:0',
-      tagStyle: 'background:color-mix(in srgb,' + catObj.color + ' 16%, transparent);color:' + catObj.color + ';border:1px solid color-mix(in srgb,' + catObj.color + ' 40%, transparent)',
-      onOpen: () => this.openQ(q.qid),
-      onToggleFav: (e) => { e.stopPropagation(); this.toggleFav(q.qid); },
-      onCopy: () => this.copyQuestion(q),
-    };
-  }
-
-  renderVals() {
-    const { tab, lang, activeCat, search, selectedQid, selectedSite, favorites, sections, sites, categories, toast } = this.state;
-    const all = sections.flatMap(s => s.questions);
-    const catById = Object.fromEntries(categories.map(c => [c.id, c]));
-    const term = search.trim().toLowerCase();
-
-    const filtered = all.filter(q => {
-      const mc = activeCat === 'all' || q.cat === activeCat;
-      const ms = !term || q.zh.toLowerCase().includes(term) || q.en.toLowerCase().includes(term);
-      return mc && ms;
-    }).map(q => this.decorate(q, lang, catById[q.cat], favorites));
-
-    const favQuestions = all.filter(q => favorites.includes(q.qid)).map(q => this.decorate(q, lang, catById[q.cat], favorites));
-
-    const allCats = [{ id: 'all', zh: '全部', en: 'All', color: 'var(--color-neutral-500)' }, ...categories];
-    const catChips = allCats.map(c => {
-      const active = activeCat === c.id;
-      const count = c.id === 'all' ? all.length : all.filter(q => q.cat === c.id).length;
-      return {
-        ...c,
-        label: (lang === 'zh' ? c.zh : c.en) + (c.id !== 'all' ? '' : ''),
-        count,
-        onSelect: () => this.setCat(c.id),
-        chipStyle: 'display:flex;align-items:center;gap:6px;flex-shrink:0;white-space:nowrap;padding:6px 12px;border-radius:999px;font-size:12px;cursor:pointer;border:1.5px solid ' +
-          (active ? c.color : 'var(--color-divider)') + ';background:' + (active ? 'color-mix(in srgb,' + c.color + ' 14%, var(--color-bg))' : 'var(--color-surface)') +
-          ';color:' + (active ? 'var(--color-text)' : 'var(--color-neutral-600)'),
-      };
-    });
-
-    const decoratedSites = sites.map(s => {
-      const cat = catById[s.cat] || {};
-      return {
-        ...s,
-        label: lang === 'zh' ? s.zh : s.en,
-        color: cat.color || 'var(--color-accent)',
-        onSelect: () => this.selectSite(s),
-        pinStyle: 'position:absolute;left:' + s.x + '%;top:' + s.y + '%;transform:translate(-50%,-100%);background:none;border:none;cursor:pointer;padding:0;filter:drop-shadow(0 2px 3px rgba(0,0,0,.25))',
-      };
-    });
-
-    const legend = categories.map(c => ({ color: c.color, label: lang === 'zh' ? c.zh : c.en }));
-
-    const selQRaw = selectedQid ? all.find(q => q.qid === selectedQid) : null;
-    const selectedQuestion = selQRaw ? this.decorate(selQRaw, lang, catById[selQRaw.cat], favorites) : null;
-    const selSite = selectedSite ? { ...selectedSite, label: lang === 'zh' ? selectedSite.zh : selectedSite.en, color: (catById[selectedSite.cat] || {}).color } : null;
-
-    const pillBase = 'flex:1;padding:7px 0;border-radius:999px;border:none;font-size:13px;font-weight:600;cursor:pointer;font-family:var(--font-body)';
-    const zhActive = lang === 'zh';
-
-    return {
-      isExplore: tab === 'explore' && !selectedQid,
-      isMap: tab === 'map' && !selectedQid,
-      isFavorites: tab === 'favorites' && !selectedQid,
-      inDetail: !!selectedQid,
-      search, onSearch: e => this.onSearch(e),
-      searchPlaceholder: lang === 'zh' ? '搜尋問題…' : 'Search questions…',
-      catChips, filtered, favQuestions,
-      hasFavorites: favQuestions.length > 0,
-      noResults: filtered.length === 0,
-      sites: decoratedSites, legend,
-      selectedSite: selSite,
-      selectedSiteCatLabel: selSite ? (lang === 'zh' ? (catById[selSite.cat] || {}).zh : (catById[selSite.cat] || {}).en) : '',
-      selectedQuestion,
-      toast,
-      setTabExplore: () => this.setTab('explore'),
-      setTabMap: () => this.setTab('map'),
-      setTabFavorites: () => this.setTab('favorites'),
-      closeQ: () => this.closeQ(),
-      goToCatFromSite: () => this.goToCatFromSite(),
-      setLangZh: () => this.setLang('zh'),
-      setLangEn: () => this.setLang('en'),
-      langZhStyle: pillBase + ';background:' + (zhActive ? 'var(--color-accent)' : 'transparent') + ';color:' + (zhActive ? 'var(--color-bg)' : 'var(--color-neutral-600)'),
-      langEnStyle: pillBase + ';background:' + (!zhActive ? 'var(--color-accent)' : 'transparent') + ';color:' + (!zhActive ? 'var(--color-bg)' : 'var(--color-neutral-600)'),
-      exploreTabColor: tab === 'explore' ? 'var(--color-accent)' : 'var(--color-neutral-500)',
-      mapTabColor: tab === 'map' ? 'var(--color-accent)' : 'var(--color-neutral-500)',
-      favTabColor: tab === 'favorites' ? 'var(--color-accent)' : 'var(--color-neutral-500)',
-      tabExploreLabel: lang === 'zh' ? '探索' : 'Explore',
-      tabMapLabel: lang === 'zh' ? '地圖' : 'Map',
-      tabFavLabel: lang === 'zh' ? '收藏' : 'Saved',
-      mapLabel: lang === 'zh' ? '苗栗地區故事地圖' : 'Miaoli story map',
-      answerLabel: lang === 'zh' ? '簡答' : 'Quick answer',
-      askAiLabel: lang === 'zh' ? '深入問 AI' : 'Ask AI further',
-      appTitleSub: lang === 'zh' ? 'AI 互動問題導覽 · 43 題' : 'AI-guided questions · 43 total',
-    };
+@media (prefers-color-scheme: light) {
+  :root:not([data-theme="dark"]) {
+    --bg:         #EDE6DA;
+    --surface:    #F5EFE6;
+    --card:       #FDFAF5;
+    --card-h:     #F5EFE6;
+    --border:     rgba(35,26,18,0.1);
+    --text:       #231A12;
+    --text-dim:   #7A6E65;
+    --text-faint: #B0A898;
   }
 }
+:root[data-theme="light"] {
+  --bg:         #EDE6DA;
+  --surface:    #F5EFE6;
+  --card:       #FDFAF5;
+  --card-h:     #F5EFE6;
+  --border:     rgba(35,26,18,0.1);
+  --text:       #231A12;
+  --text-dim:   #7A6E65;
+  --text-faint: #B0A898;
+}
+:root[data-theme="dark"] {
+  --bg:          #0C0A08;
+  --surface:     #161210;
+  --card:        #1E1812;
+  --card-h:      #261F17;
+  --border:      rgba(241,232,216,0.07);
+  --text:        #F1E8D8;
+  --text-dim:    #9A8A7E;
+  --text-faint:  #524840;
+}
+
+/* ── Reset ── */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+html { scroll-behavior: smooth; }
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: "PingFang TC", "Microsoft JhengHei", "Heiti TC", "Noto Sans TC", system-ui, sans-serif;
+  min-height: 100vh;
+  font-size: 15px;
+  line-height: 1.6;
+  transition: background .3s, color .3s;
+}
+
+/* ── Header ── */
+.site-header {
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  background: var(--bg);
+  border-bottom: 1px solid var(--border);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+}
+
+.header-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 1rem 1.5rem .75rem;
+  gap: 1rem;
+}
+
+.site-title {
+  display: flex;
+  flex-direction: column;
+}
+
+.title-main {
+  font-family: "Songti TC", "STSong", "PMingLiU", "DFKai-SB", "Noto Serif TC", Georgia, serif;
+  font-size: clamp(.95rem, 2.5vw, 1.2rem);
+  font-weight: 700;
+  letter-spacing: .06em;
+  line-height: 1.2;
+}
+
+.title-main em { font-style: normal; }
+.em-fire { color: var(--c-fire); }
+.em-clay { color: var(--c-clay); }
+
+.title-sub {
+  font-family: Georgia, "Palatino Linotype", "Times New Roman", serif;
+  font-size: .8rem;
+  color: var(--text-dim);
+  letter-spacing: .04em;
+  margin-top: .15rem;
+}
+
+.header-actions {
+  display: flex;
+  align-items: center;
+  gap: .6rem;
+  flex-shrink: 0;
+}
+
+.btn {
+  display: inline-flex;
+  align-items: center;
+  gap: .4rem;
+  padding: .45rem .9rem;
+  border-radius: var(--radius);
+  font-family: "PingFang TC", "Microsoft JhengHei", "Heiti TC", "Noto Sans TC", sans-serif;
+  font-size: .78rem;
+  font-weight: 500;
+  cursor: pointer;
+  border: 1px solid var(--border);
+  background: var(--card);
+  color: var(--text-dim);
+  transition: background .15s, color .15s, border-color .15s;
+  white-space: nowrap;
+}
+
+.btn:hover { background: var(--card-h); color: var(--text); }
+
+.btn-links {
+  background: var(--c-fire);
+  color: #fff;
+  border-color: transparent;
+}
+.btn-links:hover { opacity: .85; color: #fff; }
+
+/* ── Category nav ── */
+.cat-nav {
+  display: flex;
+  gap: .5rem;
+  padding: 0 1.5rem .75rem;
+  overflow-x: auto;
+  scrollbar-width: none;
+}
+.cat-nav::-webkit-scrollbar { display: none; }
+
+.cat-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: .35rem;
+  padding: .3rem .85rem;
+  border-radius: 99px;
+  font-size: .75rem;
+  font-weight: 500;
+  cursor: pointer;
+  border: 1.5px solid transparent;
+  background: var(--card);
+  color: var(--text-dim);
+  transition: all .2s;
+  white-space: nowrap;
+  text-decoration: none;
+}
+
+.cat-pill .dot {
+  width: 7px; height: 7px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+.cat-pill:hover,
+.cat-pill.active {
+  color: var(--text);
+}
+
+.cat-pill[data-cat="rail"]:hover,
+.cat-pill[data-cat="rail"].active { border-color: var(--c-rail); background: rgba(91,139,170,.12); }
+.cat-pill[data-cat="oil"]:hover,
+.cat-pill[data-cat="oil"].active  { border-color: var(--c-oil);  background: rgba(192,144,40,.12); }
+.cat-pill[data-cat="fire"]:hover,
+.cat-pill[data-cat="fire"].active { border-color: var(--c-fire); background: rgba(196,82,30,.12); }
+.cat-pill[data-cat="clay"]:hover,
+.cat-pill[data-cat="clay"].active { border-color: var(--c-clay); background: rgba(123,139,90,.12); }
+
+/* ── Search ── */
+.search-bar {
+  padding: 0 1.5rem .9rem;
+}
+
+.search-input {
+  width: 100%;
+  max-width: 480px;
+  padding: .55rem 1rem;
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  color: var(--text);
+  font-family: "PingFang TC", "Microsoft JhengHei", "Heiti TC", "Noto Sans TC", sans-serif;
+  font-size: .85rem;
+  outline: none;
+  transition: border-color .15s;
+}
+
+.search-input::placeholder { color: var(--text-faint); }
+.search-input:focus { border-color: var(--text-faint); }
+
+/* ── Main ── */
+main {
+  max-width: 900px;
+  margin: 0 auto;
+  padding: 1.5rem 1.5rem 6rem;
+}
+
+/* ── Section ── */
+.section {
+  margin-bottom: 3rem;
+}
+
+.section-header {
+  display: flex;
+  align-items: baseline;
+  gap: .75rem;
+  margin-bottom: 1rem;
+  padding-bottom: .6rem;
+  border-bottom: 1px solid var(--border);
+}
+
+.section-badge {
+  width: 10px; height: 10px;
+  border-radius: 50%;
+  flex-shrink: 0;
+  margin-bottom: 2px;
+}
+
+.section-title {
+  font-family: "Songti TC", "STSong", "PMingLiU", "DFKai-SB", "Noto Serif TC", Georgia, serif;
+  font-size: 1rem;
+  font-weight: 700;
+  letter-spacing: .04em;
+}
+
+.section-count {
+  font-size: .72rem;
+  color: var(--text-faint);
+  margin-left: auto;
+  font-family: Georgia, "Palatino Linotype", serif;
+  font-variant-numeric: tabular-nums;
+}
+
+/* ── Question list ── */
+.q-list {
+  display: flex;
+  flex-direction: column;
+  gap: .4rem;
+}
+
+/* ── Question card ── */
+.q-card {
+  display: flex;
+  align-items: stretch;
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  cursor: pointer;
+  text-decoration: none;
+  color: inherit;
+  transition: background .15s, transform .15s var(--ease), box-shadow .15s;
+  overflow: hidden;
+  position: relative;
+}
+
+.q-card:hover {
+  background: var(--card-h);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 20px rgba(0,0,0,.3);
+}
+
+.q-card:active { transform: translateY(0); }
+
+.q-accent {
+  width: 3px;
+  flex-shrink: 0;
+  border-radius: var(--radius) 0 0 var(--radius);
+}
+
+.q-body {
+  padding: .75rem 1rem;
+  flex: 1;
+  min-width: 0;
+}
+
+.q-num {
+  font-size: .68rem;
+  color: var(--text-faint);
+  font-family: Georgia, "Palatino Linotype", serif;
+  font-variant-numeric: tabular-nums;
+  margin-bottom: .15rem;
+  letter-spacing: .05em;
+}
+
+.q-zh {
+  font-size: .92rem;
+  font-weight: 500;
+  line-height: 1.55;
+  color: var(--text);
+  margin-bottom: .2rem;
+}
+
+.q-en {
+  font-family: Georgia, "Palatino Linotype", "Times New Roman", serif;
+  font-size: .78rem;
+  color: var(--text-dim);
+  line-height: 1.4;
+  font-style: italic;
+  display: none;
+}
+
+.q-card:hover .q-en { display: block; }
+
+.q-arrow {
+  display: flex;
+  align-items: center;
+  padding: .75rem .85rem .75rem .5rem;
+  color: var(--text-faint);
+  flex-shrink: 0;
+  transition: color .15s, transform .15s;
+}
+
+.q-card:hover .q-arrow {
+  color: var(--text-dim);
+  transform: translateX(2px);
+}
+
+/* hidden state */
+.q-card[hidden] { display: none; }
+.section[hidden] { display: none; }
+
+/* no results */
+.no-results {
+  text-align: center;
+  padding: 3rem 1rem;
+  color: var(--text-faint);
+  font-family: Georgia, "Palatino Linotype", serif;
+  font-size: 1rem;
+  display: none;
+}
+
+/* ── URL Modal ── */
+.modal-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 200;
+  background: rgba(0,0,0,.7);
+  backdrop-filter: blur(4px);
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity .2s;
+}
+
+.modal-overlay.open {
+  opacity: 1;
+  pointer-events: all;
+}
+
+.modal {
+  width: 100%;
+  max-width: 760px;
+  max-height: 80vh;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-bottom: none;
+  border-radius: 12px 12px 0 0;
+  display: flex;
+  flex-direction: column;
+  transform: translateY(100%);
+  transition: transform .3s var(--ease);
+}
+
+.modal-overlay.open .modal {
+  transform: translateY(0);
+}
+
+.modal-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 1.2rem 1.4rem 1rem;
+  border-bottom: 1px solid var(--border);
+  flex-shrink: 0;
+}
+
+.modal-title {
+  font-family: "Songti TC", "STSong", "PMingLiU", "DFKai-SB", "Noto Serif TC", Georgia, serif;
+  font-size: .95rem;
+  font-weight: 700;
+}
+
+.modal-actions {
+  display: flex;
+  gap: .5rem;
+  align-items: center;
+}
+
+.btn-copy-all {
+  background: var(--c-fire);
+  color: #fff;
+  border-color: transparent;
+}
+.btn-copy-all:hover { opacity: .85; color: #fff; }
+
+.btn-close {
+  padding: .4rem .6rem;
+  font-size: 1rem;
+}
+
+.modal-body {
+  overflow-y: auto;
+  padding: 1rem 1.4rem 2rem;
+  flex: 1;
+}
+
+.modal-section {
+  margin-bottom: 1.5rem;
+}
+
+.modal-section-title {
+  font-size: .72rem;
+  font-weight: 500;
+  letter-spacing: .1em;
+  color: var(--text-faint);
+  text-transform: uppercase;
+  margin-bottom: .6rem;
+  display: flex;
+  align-items: center;
+  gap: .5rem;
+}
+
+.modal-section-title::after {
+  content: '';
+  flex: 1;
+  height: 1px;
+  background: var(--border);
+}
+
+.url-row {
+  display: flex;
+  align-items: flex-start;
+  gap: .75rem;
+  padding: .5rem 0;
+  border-bottom: 1px solid var(--border);
+}
+
+.url-row:last-child { border-bottom: none; }
+
+.url-qnum {
+  font-family: Georgia, "Palatino Linotype", serif;
+  font-size: .75rem;
+  color: var(--text-faint);
+  padding-top: .15rem;
+  flex-shrink: 0;
+  width: 2rem;
+  font-variant-numeric: tabular-nums;
+}
+
+.url-content { flex: 1; min-width: 0; }
+
+.url-qtext {
+  font-size: .82rem;
+  color: var(--text);
+  margin-bottom: .2rem;
+  line-height: 1.4;
+}
+
+.url-link {
+  font-family: "Courier New", Courier, monospace;
+  font-size: .7rem;
+  color: var(--text-dim);
+  word-break: break-all;
+  text-decoration: none;
+  transition: color .15s;
+  display: block;
+  line-height: 1.5;
+}
+.url-link:hover { color: var(--c-fire); text-decoration: underline; }
+
+.url-copy {
+  flex-shrink: 0;
+  padding: .3rem .5rem;
+  font-size: .7rem;
+  margin-top: .05rem;
+}
+
+.url-copy.copied {
+  color: var(--c-clay);
+  border-color: var(--c-clay);
+}
+
+/* ── Toast ── */
+.toast {
+  position: fixed;
+  bottom: 2rem;
+  left: 50%;
+  transform: translateX(-50%) translateY(2rem);
+  background: var(--card);
+  color: var(--text);
+  border: 1px solid var(--border);
+  border-radius: 99px;
+  padding: .6rem 1.2rem;
+  font-size: .82rem;
+  z-index: 300;
+  opacity: 0;
+  transition: opacity .2s, transform .2s;
+  pointer-events: none;
+  white-space: nowrap;
+}
+
+.toast.show {
+  opacity: 1;
+  transform: translateX(-50%) translateY(0);
+}
+
+/* ── Footer ── */
+.site-footer {
+  text-align: center;
+  padding: 2rem 1rem;
+  font-family: Georgia, "Palatino Linotype", serif;
+  font-size: .78rem;
+  color: var(--text-faint);
+  border-top: 1px solid var(--border);
+  margin-top: 2rem;
+}
+
+/* ── Responsive ── */
+@media (max-width: 600px) {
+  .header-top { padding: .8rem 1rem .6rem; }
+  .cat-nav, .search-bar { padding-left: 1rem; padding-right: 1rem; }
+  main { padding: 1rem 1rem 5rem; }
+  .title-main { font-size: .88rem; }
+  .title-sub { font-size: .72rem; }
+  .btn { padding: .38rem .7rem; font-size: .72rem; }
+}
+</style>
+
+<!-- Header -->
+<header class="site-header">
+  <div class="header-top">
+    <div class="site-title">
+      <span class="title-main">
+        <em class="em-fire">火</em><em class="em-clay">土</em>之源 — 台六線的苗栗陶及鐵道故事
+      </span>
+      <span class="title-sub">AI 互動問題導覽 · 43 題</span>
+    </div>
+    <div class="header-actions">
+      <button class="btn btn-links" id="btnLinks">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg>
+        全部連結
+      </button>
+      <button class="btn" id="btnTheme" title="切換主題" aria-label="切換主題">
+        <svg id="iconTheme" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M6.34 17.66l-1.41 1.41M19.07 4.93l-1.41 1.41"/></svg>
+      </button>
+    </div>
+  </div>
+
+  <!-- Category filter pills -->
+  <nav class="cat-nav" role="navigation" aria-label="分類篩選">
+    <a class="cat-pill active" data-cat="all" href="#" role="button">
+      <span class="dot" style="background:var(--text-dim)"></span>全部（43）
+    </a>
+    <a class="cat-pill" data-cat="rail" href="#sec-rail" role="button">
+      <span class="dot" style="background:var(--c-rail)"></span>縱貫鐵道 / 輕便軌道
+    </a>
+    <a class="cat-pill" data-cat="oil" href="#sec-oil" role="button">
+      <span class="dot" style="background:var(--c-oil)"></span>出磺坑
+    </a>
+    <a class="cat-pill" data-cat="fire" href="#sec-fire" role="button">
+      <span class="dot" style="background:var(--c-fire)"></span>中油探採事業部
+    </a>
+    <a class="cat-pill" data-cat="clay" href="#sec-clay" role="button">
+      <span class="dot" style="background:var(--c-clay)"></span>苗栗陶
+    </a>
+  </nav>
+
+  <!-- Search -->
+  <div class="search-bar">
+    <input class="search-input" type="search" id="searchInput"
+      placeholder="搜尋問題… Search questions…" autocomplete="off">
+  </div>
+</header>
+
+<main>
+  <div class="no-results" id="noResults">找不到符合的問題 / No questions found</div>
+  <!-- Sections rendered by JS -->
+</main>
+
+<footer class="site-footer">
+  點選任一問題 → 直接開啟 ChatGPT 並帶入問題 · Click any question to open ChatGPT
+</footer>
+
+<!-- URL Modal -->
+<div class="modal-overlay" id="modalOverlay" role="dialog" aria-modal="true" aria-label="全部問題連結">
+  <div class="modal">
+    <div class="modal-head">
+      <span class="modal-title">全部問題連結（43 題）</span>
+      <div class="modal-actions">
+        <button class="btn btn-copy-all" id="btnCopyAll">複製全部</button>
+        <button class="btn btn-close" id="btnClose" aria-label="關閉">✕</button>
+      </div>
+    </div>
+    <div class="modal-body" id="modalBody"></div>
+  </div>
+</div>
+
+<!-- Toast -->
+<div class="toast" id="toast"></div>
+
+<script>
+// ── Data ──────────────────────────────────────────────────────────
+const SECTIONS = [
+  {
+    id: 'rail',
+    title: '縱貫鐵道及輕便軌道',
+    color: 'var(--c-rail)',
+    questions: [
+      { zh: '日治時期1899年為何要蓋縱貫鐵道？', en: 'Why was the Trans-Taiwan Railway built in 1899 during the Japanese colonial period?' },
+      { zh: '苗栗市的舊山線「功維敘隧道」有何歷史特色？', en: 'What are the historical features of the "Gong Weixu Tunnel" on the Old Mountain Line in Miaoli City?' },
+      { zh: '為何台灣與日本的鐵道都是「窄軌」而非「標準軌」？', en: 'Why do Taiwan and Japan both use "narrow-gauge" railways instead of "standard-gauge" ones?' },
+      { zh: '苗栗三義到后里的舊山線鐵道建設耗時五年，此工程有多困難？', en: 'The construction of the Old Mountain Line from Sanyi to Houli took five years. Just how difficult was this project?' },
+      { zh: '日治時期舊山線三義到后里的五大工程奇蹟為何？', en: 'What were the five engineering marvels of the Old Mountain Line (Sanyi–Houli) during the Japanese colonial period?' },
+      { zh: '苗栗火車頭園區內最具特色的火車頭，與舊山線鐵道的關係？', en: 'What is the connection between the most distinctive locomotive at the Miaoli Locomotive Park and the Old Mountain Line?' },
+      { zh: '苗栗已有山線鐵道，為何還要蓋海線鐵道？', en: 'Miaoli already has the Mountain Line; why build the Coastal Line as well?' },
+      { zh: '「輕便軌道」的軌距規格為何？和縱貫線「窄軌」鐵道運輸方式有何差異？', en: 'What is the track gauge for the "Light Rail" system? How does it differ from the narrow-gauge rail transport on the Longitudinal Line?' },
+      { zh: '日治時期，苗栗市到出磺坑的「輕便軌道」，主要運送什麼貨物？', en: 'During the Japanese colonial period, what goods were primarily transported on the light railway between Miaoli City and Chusangkeng?' },
+      { zh: '苗栗市紳「黃南球」，為何有能力興建苗栗市到公館、大湖的「輕便軌道」？', en: 'Why was Huang Nanqiu, a gentleman from Miaoli City, able to build the light rail connecting Miaoli City to Gongguan and Dahu?' },
+      { zh: '1920年代是苗栗輕便軌道最盛時期，何時開始沒落，被什麼取代？', en: 'The 1920s marked the heyday of the Miaoli light rail system. When did its decline begin, and what replaced it?' },
+    ]
+  },
+  {
+    id: 'oil',
+    title: '（火）出磺坑',
+    color: 'var(--c-oil)',
+    questions: [
+      { zh: '出磺坑是全世界第二古老的油田，那第一座在那？', en: 'Chusongkeng is the second-oldest oil field in the world. So where is the oldest one?' },
+      { zh: '出磺坑在清朝時如何開採石油？', en: 'How was oil extracted at Chusongkeng during the Qing Dynasty?' },
+      { zh: '公館人「邱阿玉」在清朝及日治時期，和出磺坑石油有何關係？', en: 'What was the connection between "Qiu Ayu," a resident of Gongguan, and the oil discovery in Chusongkeng during the Qing Dynasty and Japanese colonial period?' },
+      { zh: '出磺坑在日治時期如何開採石油？', en: 'How was oil extracted at Chusongkeng during the Japanese colonial period?' },
+      { zh: '出磺坑為何曾有「小香港」之稱？', en: 'Why was Chusongkeng once known as "Little Hong Kong"?' },
+      { zh: '出磺坑目前仍有在開採石油或天然氣嗎？', en: 'Is oil or natural gas still being extracted at Chusongkeng?' },
+    ]
+  },
+  {
+    id: 'fire',
+    title: '（火）中油探採事業部',
+    color: 'var(--c-fire)',
+    questions: [
+      { zh: '苗栗地區為何是「中油探採事業部」的起源地？', en: 'Why is the Miaoli area the birthplace of the CPC Exploration and Production Division?' },
+      { zh: '苗栗市週邊30公里內就有三大油氣井，其功能與特色為何？', en: 'There are three major oil and gas wells within a 30-kilometer radius of Miaoli City. What are their functions and characteristics?' },
+      { zh: '「中油探採事業部」的主要任務為何？', en: 'What is the primary mission of the CPC Exploration and Production Division?' },
+      { zh: '「中油探採事業部」近年推動「碳封存」與「地熱發電」的案例？', en: 'What are recent examples of carbon sequestration and geothermal power generation initiatives promoted by CPC\'s Exploration and Production Division?' },
+      { zh: '苗栗是全台最早鋪設天然氣管線的地方，1970年代管線範圍最遠到那裡？', en: 'Miaoli was the first place in Taiwan to have natural gas pipelines installed. How far did the pipeline network extend in the 1970s?' },
+      { zh: '「聯合工專」成立前，原址是「中央大學」1963年設立的「地球物理研究所」，與中油探採事業部有何關係？', en: 'Before the United Institute of Technology was established, the site was home to the Institute of Geophysics (National Central University, 1963). What is its relationship with CPC\'s E&P Division?' },
+      { zh: '「國立聯合大學」前身「聯合工專」，第一任董事長為何是台灣石化工業開拓者「金開英」？', en: 'National United University was formerly United Technical College. Why was Jin Kaiying, a pioneer of Taiwan\'s petrochemical industry, its first chairman?' },
+      { zh: '「聯合工專」為何捐給教育部並改制為國立？與「聯合工商教育基金會」的關係為何？', en: 'Why was United Technical College donated to the Ministry of Education and reorganized as a national institution? What is its relationship with the United Industrial and Commercial Education Foundation?' },
+    ]
+  },
+  {
+    id: 'clay',
+    title: '（土）苗栗陶',
+    color: 'var(--c-clay)',
+    questions: [
+      { zh: '1897年來台的「岩本東作」，爲何被稱爲「苗栗陶之父」？', en: 'Why is Tosaku Iwamoto, who came to Taiwan in 1897, known as the "Father of Miaoli Pottery"?' },
+      { zh: '岩本東作生產的「陶管」與日治時期的縱貫鐵道建設關係為何？', en: 'What is the connection between the ceramic pipes produced by Tosaku Iwamoto and the construction of the Longitudinal Railway during the Japanese colonial period?' },
+      { zh: '日本愛知縣的千年陶都「常滑市」有那些特色與稱號？', en: 'What are the distinctive features and nicknames of Tokoname, the thousand-year-old pottery capital in Aichi Prefecture, Japan?' },
+      { zh: '「常滑燒」與「苗栗陶」有何相似之處？', en: 'What similarities are there between Tokoname-yaki and Miaoli Pottery?' },
+      { zh: '日治時期「陶管」製作的困難之處？', en: 'What were the challenges involved in making clay pipes during the Japanese colonial period?' },
+      { zh: '苗栗為何能在1960-1970年代，幾乎壟斷台灣的大型甕缸及酒甕市場？', en: 'Why was Miaoli able to virtually monopolize Taiwan\'s market for large earthenware jars and wine jars in the 1960s and 1970s?' },
+      { zh: '「銅鑼窯」的手擠胚技術，能製作出多大的甕缸？', en: 'How large of a jar can be made using the Tongluo Kiln hand-squeezed clay technique?' },
+      { zh: '苗栗為何能在1970-1980年代，發展出獨特且大規模的裝飾陶瓷產業？', en: 'Why was Miaoli able to develop a unique and large-scale decorative ceramics industry in the 1970s and 1980s?' },
+      { zh: '「裝飾陶瓷」人偶製作的困難之處為何？', en: 'What are the challenges involved in making decorative ceramic figurines?' },
+      { zh: '裝飾陶瓷時期玩偶的「陶瓷蕾絲」效果，是如何製作出來的？', en: 'How was the "ceramic lace" effect on decorative ceramic dolls from that period created?' },
+      { zh: '「五鼓文化村」前身是裝飾陶瓷廠，目前的展示空間與創新商品為何？', en: '"Wugu Cultural Village" was formerly a decorative ceramics factory. What are its current exhibition spaces and innovative products?' },
+      { zh: '「東億陶瓷廠」保存了那些陶瓷石膏模製程及創新的捏陶五感體驗？', en: 'Does "Dongyi Ceramics Factory" preserve ceramic plaster mold-making processes and offer an innovative hands-on pottery experience engaging all five senses?' },
+      { zh: '為何文化部工藝中心會在苗栗設立分館，有那些特色？', en: "Why did the Ministry of Culture's Craft Center establish a branch in Miaoli, and what are its unique features?" },
+      { zh: '苗栗縣文觀局營運的公館「陶瓷博物館」，有那些特色？', en: 'What are the highlights of the Gongguan Ceramics Museum, operated by the Miaoli County Bureau of Culture and Tourism?' },
+      { zh: '苗栗為何在1990年代，成為台灣「柴燒陶」最重要的發展地？', en: 'Why did Miaoli become the most important center for the development of wood-fired pottery in Taiwan during the 1990s?' },
+      { zh: '「漢寶窯」在苗栗柴燒陶扮演的角色？', en: 'What role does Hanbao Kiln play in wood-fired pottery in Miaoli?' },
+      { zh: '「柴燒陶」迷人的金屬光澤（金銀彩）與火刺現象，是如何形成的？', en: 'How are the captivating metallic luster (gold and silver glazes) and the "fire spots" of wood-fired pottery formed?' },
+      { zh: '「金龍窯」擅長那些柴燒、庭院陶具開發以及客製化陶器代工？', en: 'Does "Golden Dragon Kiln" specialize in wood-fired pottery, the development of garden pottery, and custom pottery manufacturing?' },
+    ]
+  }
+];
+
+// ── URL builder ────────────────────────────────────────────────────
+function chatGPTUrl(zh) {
+  return 'https://chatgpt.com/?q=' + encodeURIComponent(zh);
+}
+
+// ── Build question numbers globally ───────────────────────────────
+let globalNum = 0;
+SECTIONS.forEach(s => s.questions.forEach(q => { globalNum++; q.num = globalNum; }));
+
+// ── Render main sections ───────────────────────────────────────────
+const main = document.querySelector('main');
+
+SECTIONS.forEach(sec => {
+  const section = document.createElement('section');
+  section.className = 'section';
+  section.id = 'sec-' + sec.id;
+  section.dataset.cat = sec.id;
+
+  section.innerHTML = `
+    <div class="section-header">
+      <div class="section-badge" style="background:${sec.color}"></div>
+      <h2 class="section-title">${sec.title}</h2>
+      <span class="section-count">${sec.questions.length} 題</span>
+    </div>
+    <div class="q-list" id="list-${sec.id}"></div>
+  `;
+  main.appendChild(section);
+
+  const list = section.querySelector('.q-list');
+
+  sec.questions.forEach(q => {
+    const a = document.createElement('a');
+    a.className = 'q-card';
+    a.href = chatGPTUrl(q.zh);
+    a.target = '_blank';
+    a.rel = 'noopener noreferrer';
+    a.dataset.zh = q.zh;
+    a.dataset.en = q.en;
+    a.dataset.cat = sec.id;
+    a.innerHTML = `
+      <div class="q-accent" style="background:${sec.color}"></div>
+      <div class="q-body">
+        <div class="q-num">Q${String(q.num).padStart(2,'0')}</div>
+        <div class="q-zh">${q.zh}</div>
+        <div class="q-en">${q.en}</div>
+      </div>
+      <div class="q-arrow">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M7 17L17 7M17 7H7M17 7v10"/></svg>
+      </div>
+    `;
+    list.appendChild(a);
+  });
+});
+
+// ── Category filter ────────────────────────────────────────────────
+const pills = document.querySelectorAll('.cat-pill');
+let activeCat = 'all';
+
+pills.forEach(pill => {
+  pill.addEventListener('click', e => {
+    e.preventDefault();
+    activeCat = pill.dataset.cat;
+    pills.forEach(p => p.classList.remove('active'));
+    pill.classList.add('active');
+
+    // scroll to section if specific cat
+    if (activeCat !== 'all') {
+      const sec = document.getElementById('sec-' + activeCat);
+      if (sec) sec.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
+
+    applyFilters();
+  });
+});
+
+// ── Search ─────────────────────────────────────────────────────────
+const searchInput = document.getElementById('searchInput');
+searchInput.addEventListener('input', applyFilters);
+
+function applyFilters() {
+  const term = searchInput.value.trim().toLowerCase();
+  const cards = document.querySelectorAll('.q-card');
+  const sections = document.querySelectorAll('.section');
+  let anyVisible = false;
+
+  cards.forEach(card => {
+    const matchCat = activeCat === 'all' || card.dataset.cat === activeCat;
+    const matchSearch = !term ||
+      card.dataset.zh.toLowerCase().includes(term) ||
+      card.dataset.en.toLowerCase().includes(term);
+    const show = matchCat && matchSearch;
+    card.hidden = !show;
+    if (show) anyVisible = true;
+  });
+
+  // Hide sections with no visible cards
+  sections.forEach(sec => {
+    const hasVisible = [...sec.querySelectorAll('.q-card')].some(c => !c.hidden);
+    sec.hidden = !hasVisible;
+  });
+
+  document.getElementById('noResults').style.display = anyVisible ? 'none' : 'block';
+}
+
+// ── URL Modal ──────────────────────────────────────────────────────
+const modalOverlay = document.getElementById('modalOverlay');
+const modalBody    = document.getElementById('modalBody');
+
+function buildModal() {
+  modalBody.innerHTML = '';
+  SECTIONS.forEach(sec => {
+    const ms = document.createElement('div');
+    ms.className = 'modal-section';
+    ms.innerHTML = `<div class="modal-section-title" style="color:${sec.color}">${sec.title}</div>`;
+
+    sec.questions.forEach(q => {
+      const url = chatGPTUrl(q.zh);
+      const row = document.createElement('div');
+      row.className = 'url-row';
+      row.innerHTML = `
+        <span class="url-qnum">Q${String(q.num).padStart(2,'0')}</span>
+        <div class="url-content">
+          <div class="url-qtext">${q.zh}</div>
+          <a class="url-link" href="${url}" target="_blank" rel="noopener">${url}</a>
+        </div>
+        <button class="btn url-copy" data-url="${url}">複製</button>
+      `;
+      ms.appendChild(row);
+    });
+    modalBody.appendChild(ms);
+  });
+
+  // Copy individual URL
+  modalBody.querySelectorAll('.url-copy').forEach(btn => {
+    btn.addEventListener('click', () => {
+      navigator.clipboard.writeText(btn.dataset.url).then(() => {
+        btn.textContent = '✓ 已複製';
+        btn.classList.add('copied');
+        setTimeout(() => { btn.textContent = '複製'; btn.classList.remove('copied'); }, 1500);
+      });
+    });
+  });
+}
+
+document.getElementById('btnLinks').addEventListener('click', () => {
+  buildModal();
+  modalOverlay.classList.add('open');
+});
+
+document.getElementById('btnClose').addEventListener('click', () => {
+  modalOverlay.classList.remove('open');
+});
+
+modalOverlay.addEventListener('click', e => {
+  if (e.target === modalOverlay) modalOverlay.classList.remove('open');
+});
+
+// Copy all URLs
+document.getElementById('btnCopyAll').addEventListener('click', () => {
+  let text = '';
+  SECTIONS.forEach(sec => {
+    text += `\n【${sec.title}】\n`;
+    sec.questions.forEach(q => {
+      text += `Q${String(q.num).padStart(2,'0')}. ${q.zh}\n${chatGPTUrl(q.zh)}\n\n`;
+    });
+  });
+  navigator.clipboard.writeText(text.trim()).then(() => showToast('✓ 已複製全部 43 個連結'));
+});
+
+// ── Toast ──────────────────────────────────────────────────────────
+const toast = document.getElementById('toast');
+let toastTimer;
+function showToast(msg) {
+  clearTimeout(toastTimer);
+  toast.textContent = msg;
+  toast.classList.add('show');
+  toastTimer = setTimeout(() => toast.classList.remove('show'), 2200);
+}
+
+// ── Theme toggle ───────────────────────────────────────────────────
+const btnTheme = document.getElementById('btnTheme');
+const iconTheme = document.getElementById('iconTheme');
+
+const sunSVG = `<circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M6.34 17.66l-1.41 1.41M19.07 4.93l-1.41 1.41"/>`;
+const moonSVG = `<path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/>`;
+
+let theme = (() => {
+  try { return localStorage.getItem('huotu-theme') || 'system'; } catch { return 'system'; }
+})();
+
+function applyTheme(t) {
+  theme = t;
+  if (t === 'dark') {
+    document.documentElement.setAttribute('data-theme','dark');
+    iconTheme.innerHTML = sunSVG;
+  } else if (t === 'light') {
+    document.documentElement.setAttribute('data-theme','light');
+    iconTheme.innerHTML = moonSVG;
+  } else {
+    document.documentElement.removeAttribute('data-theme');
+    iconTheme.innerHTML = moonSVG;
+  }
+  try { localStorage.setItem('huotu-theme', t); } catch {}
+}
+
+applyTheme(theme);
+
+btnTheme.addEventListener('click', () => {
+  const next = theme === 'dark' ? 'light' : 'dark';
+  applyTheme(next);
+});
 </script>
-</body>
-</html>
