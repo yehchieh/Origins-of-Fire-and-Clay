@@ -260,7 +260,7 @@ html,body{
 
 /* ── SITE POPUP ── */
 .site-popup{
-  position:absolute;left:0;right:0;bottom:0;
+  position:fixed;left:0;right:0;bottom:0;
   background:var(--surface);
   border-radius:20px 20px 0 0;
   box-shadow:0 -4px 24px rgba(0,0,0,0.18);
@@ -292,7 +292,7 @@ html,body{
   display:flex;align-items:center;justify-content:center;
 }
 .site-popup-backdrop{
-  position:absolute;inset:0;background:rgba(0,0,0,0.35);
+  position:fixed;inset:0;background:rgba(0,0,0,0.35);
   z-index:19;display:none;
 }
 .site-popup-backdrop.open{display:block}
