@@ -186,13 +186,15 @@ html,body{
   display:flex;
   flex-direction:column;
   gap:5px;
-  position:relative;
+  -webkit-user-select:none;
+  user-select:none;
 }
 .q-card:active{transform:scale(0.985);box-shadow:0 1px 2px rgba(0,0,0,0.05)}
-.q-card-cat{font-size:11px;font-weight:600;letter-spacing:0.4px}
+.q-card-top{display:flex;align-items:center;justify-content:space-between;gap:8px}
+.q-card-cat{font-size:11px;font-weight:600;letter-spacing:0.4px;flex:1;min-width:0}
+.q-card-fav{font-size:16px;line-height:1;flex-shrink:0;pointer-events:none}
 .q-card-text{font-size:15px;font-weight:500;line-height:1.45;color:var(--text)}
 .q-card-sub{font-size:12px;color:var(--text2);line-height:1.4;font-family:Georgia,serif}
-.q-card-fav{position:absolute;top:12px;right:12px;font-size:16px;line-height:1}
 
 /* ── EMPTY STATE ── */
 .empty{text-align:center;padding:60px 20px;color:var(--text2);font-size:15px}
@@ -366,8 +368,16 @@ html,body{
 
 /* Desktop: show as phone frame */
 @media(min-width:500px){
-  body{display:flex;align-items:center;justify-content:center;background:#222}
-  #app{height:90vh;max-height:900px;border-radius:44px;overflow:hidden}
+  html,body{height:100%;overflow:hidden;background:#1e1a16}
+  body{display:flex;align-items:center;justify-content:center}
+  #app{
+    width:390px;
+    max-width:390px;
+    height:min(844px,92vh);
+    border-radius:44px;
+    box-shadow:0 0 0 2px rgba(255,255,255,0.08),0 32px 80px rgba(0,0,0,0.7);
+    overflow:hidden;
+  }
 }
 </style>
 </head>
@@ -481,7 +491,7 @@ var SITES = [
   { cat:'oil',  zh:'出磺坑油田',              en:'Chusongkeng Oil Field',                x:70, y:55 },
   { cat:'fire', zh:'中油探採事業部（苗栗）',   en:'CPC E&P Division, Miaoli',            x:44, y:44 },
   { cat:'clay', zh:'公館陶瓷博物館',          en:'Gongguan Ceramics Museum',             x:62, y:60 },
-  { cat:'clay', zh:'銅鑼窯 / 五穀文化村',     en:'Tongluo Kiln & Wugu Cultural Village', x:30, y:66 }
+  { cat:'clay', zh:'銅鑼窯 / 五鼓文化村',     en:'Tongluo Kiln & Wugu Cultural Village', x:30, y:66 }
 ];
 
 var SECTIONS = [
@@ -527,7 +537,7 @@ var SECTIONS = [
     { zh:'苗栗為何能在1970-1980年代，發展出獨特且大規模的裝飾陶瓷產業？', en:'Why was Miaoli able to develop a unique and large-scale decorative ceramics industry in the 1970s and 1980s?', azh:'隨著大甕缸市場需求轉弱，苗栗窯場轉型承接歐美外銷訂單，投入人偶與擺飾陶瓷生產，發展出規模龐大的裝飾陶瓷產業。', aen:"As demand for large jars waned, Miaoli kilns pivoted to export orders from Europe and the US, producing figurines and ornaments that grew into a large decorative-ceramics industry." },
     { zh:'「裝飾陶瓷」人偶製作的困難之處為何？', en:'What are the challenges involved in making decorative ceramic figurines?', azh:'人偶需精細的石膏模具灌漿成型，手工上色與細節修坯耗時費工，燒製時尺寸稍大即容易變形或色彩失準。', aen:"Figurines require finely made plaster molds and slip-casting, with time-consuming hand painting and detail work; larger pieces easily warp or misfire in color during kilning." },
     { zh:'裝飾陶瓷時期玩偶的「陶瓷蕾絲」效果，是如何製作出來的？', en:'How was the "ceramic lace" effect on decorative ceramic dolls from that period created?', azh:'工匠將真實蕾絲布浸入陶漿後披覆於坯體，燒製時布料燃燒殆盡，只留下陶土翻模出的精緻蕾絲紋理。', aen:"Craftsmen dipped real lace fabric in liquid clay and draped it over the figure; during firing the fabric burned away, leaving only the delicate lace pattern cast in clay." },
-    { zh:'「五穀文化村」前身是裝飾陶瓷廠，目前的展示空間與創新商品為何？', en:'"Wugu Cultural Village" was formerly a decorative ceramics factory. What are its current exhibition spaces and innovative products?', azh:'五穀文化村保留舊廠房作為常設展區，展示裝飾陶瓷歷史文物，並開發文創商品與體驗課程吸引遊客參觀。', aen:"Wugu Cultural Village preserves the old factory as a permanent exhibit of decorative-ceramics artifacts, and has developed creative merchandise and hands-on workshops for visitors." },
+    { zh:'「五鼓文化村」前身是裝飾陶瓷廠，目前的展示空間與創新商品為何？', en:'"Wugu Cultural Village" was formerly a decorative ceramics factory. What are its current exhibition spaces and innovative products?', azh:'五鼓文化村保留舊廠房作為常設展區，展示裝飾陶瓷歷史文物，並開發文創商品與體驗課程吸引遊客參觀。', aen:"Wugu Cultural Village preserves the old factory as a permanent exhibit of decorative-ceramics artifacts, and has developed creative merchandise and hands-on workshops for visitors." },
     { zh:'「東億陶瓷廠」保存了那些陶瓷石膏模製程及創新的捏陶五感體驗？', en:'Does "Dongyi Ceramics Factory" preserve ceramic plaster mold-making processes and offer an innovative hands-on pottery experience engaging all five senses?', azh:'東億陶瓷廠完整保留石膏模灌漿製程與老設備，並設計結合觸覺、嗅覺與視覺的捏陶體驗課程，讓遊客親手感受陶藝工序。', aen:"Dongyi Ceramics Factory retains its full plaster-mold slip-casting process and vintage equipment, and offers hands-on pottery workshops engaging touch, smell and sight." },
     { zh:'為何文化部工藝中心會在苗栗設立分館，有那些特色？', en:"Why did the Ministry of Culture's Craft Center establish a branch in Miaoli, and what are its unique features?", azh:"苗栗擁有深厚的陶瓷工藝底蘊與匠師群，文化部因此設立分館推廣傳統工藝傳承與創新，並提供駐村與展覽空間。", aen:"Given Miaoli's deep ceramics heritage and pool of craftsmen, the Ministry of Culture set up a branch there to promote traditional-craft preservation and innovation, with residency and exhibition space." },
     { zh:'苗栗縣文觀局營運的公館「陶瓷博物館」，有那些特色？', en:'What are the highlights of the Gongguan Ceramics Museum, operated by the Miaoli County Bureau of Culture and Tourism?', azh:"館內完整呈現苗栗陶從陶管、甕缸到裝飾陶瓷的產業變遷，並設有DIY體驗區，是了解苗栗陶史的核心場館。", aen:"The museum traces Miaoli pottery's evolution from pipes and jars to decorative ceramics, with a DIY workshop area — the key venue for understanding the region's pottery history." },
@@ -621,10 +631,12 @@ function qCardHTML(q) {
   var mainText = lang==='zh' ? q.zh : q.en;
   var subText  = lang==='zh' ? q.en : q.zh;
   return '<div class="q-card" style="border-color:'+cat.color+'" onclick="openSheet(\''+q.id+'\')">'
+    +'<div class="q-card-top">'
     +'<div class="q-card-cat" style="color:'+cat.color+'">'+cat.icon+' '+(lang==='zh'?cat.zh:cat.en)+'</div>'
+    +'<div class="q-card-fav">'+(isFav?'❤️':'🤍')+'</div>'
+    +'</div>'
     +'<div class="q-card-text">'+mainText+'</div>'
     +'<div class="q-card-sub">'+subText+'</div>'
-    +'<div class="q-card-fav">'+(isFav?'❤️':'🤍')+'</div>'
     +'</div>';
 }
 
