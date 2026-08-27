@@ -251,10 +251,79 @@ html,body{
   background:var(--surface);border-radius:12px;
   padding:12px 14px;display:flex;align-items:center;gap:12px;
   box-shadow:0 1px 3px rgba(0,0,0,0.06);
+  cursor:pointer;transition:transform 0.12s,box-shadow 0.12s;
 }
+.site-card:active{transform:scale(0.97);box-shadow:0 0 0 rgba(0,0,0,0.04)}
 .site-dot{width:10px;height:10px;border-radius:50%;flex-shrink:0}
 .site-zh{font-size:14px;font-weight:500}
 .site-en{font-size:12px;color:var(--text2);margin-top:2px;font-family:Georgia,serif}
+
+/* ── SITE POPUP ── */
+.site-popup{
+  position:absolute;left:0;right:0;bottom:0;
+  background:var(--surface);
+  border-radius:20px 20px 0 0;
+  box-shadow:0 -4px 24px rgba(0,0,0,0.18);
+  padding:0 0 calc(var(--safe-bot) + 8px);
+  transform:translateY(100%);
+  transition:transform 0.3s cubic-bezier(0.32,0.72,0,1);
+  z-index:20;
+}
+.site-popup.open{transform:translateY(0)}
+.site-popup-handle{width:36px;height:4px;background:var(--border);border-radius:2px;margin:10px auto 14px}
+.site-popup-body{padding:0 18px 14px}
+.site-popup-cat{display:inline-flex;align-items:center;gap:5px;font-size:11px;font-weight:600;padding:3px 10px;border-radius:12px;margin-bottom:10px}
+.site-popup-name{font-size:18px;font-weight:700;line-height:1.3;margin-bottom:3px}
+.site-popup-name-en{font-size:12px;color:var(--text2);font-family:Georgia,serif;margin-bottom:12px}
+.site-popup-desc{font-size:13px;line-height:1.65;color:var(--text);margin-bottom:16px}
+.site-popup-gmap{
+  display:flex;align-items:center;justify-content:center;gap:8px;
+  background:var(--accent);color:#fff;
+  border-radius:14px;padding:12px;
+  font-size:14px;font-weight:600;
+  text-decoration:none;
+}
+.site-popup-gmap:active{opacity:0.85}
+.site-popup-close{
+  position:absolute;top:12px;right:16px;
+  width:28px;height:28px;border-radius:50%;
+  background:var(--surface2);border:none;
+  font-size:14px;cursor:pointer;
+  display:flex;align-items:center;justify-content:center;
+}
+.site-popup-backdrop{
+  position:absolute;inset:0;background:rgba(0,0,0,0.35);
+  z-index:19;display:none;
+}
+.site-popup-backdrop.open{display:block}
+
+/* ── APP FOOTER ── */
+.app-footer{
+  margin:24px 16px 8px;
+  padding:18px 16px;
+  border-radius:16px;
+  background:var(--surface);
+  border:1px solid var(--border);
+}
+.app-footer-sponsor{
+  display:flex;align-items:center;gap:8px;
+  font-size:11px;color:var(--text2);margin-bottom:12px;
+}
+.app-footer-sponsor-badge{
+  font-size:10px;font-weight:600;
+  padding:2px 8px;border-radius:8px;
+  background:#1C3D6E;color:#fff;white-space:nowrap;
+}
+.app-footer-row{font-size:11px;color:var(--text2);line-height:1.7;margin-bottom:6px}
+.app-footer-row strong{color:var(--text);font-weight:600}
+.app-footer-partners{
+  display:flex;flex-wrap:wrap;gap:5px;margin-top:10px;
+}
+.app-footer-tag{
+  font-size:10px;padding:3px 9px;border-radius:10px;
+  background:var(--bg);color:var(--text2);
+  border:1px solid var(--border);
+}
 
 /* ── SAVED TAB ── */
 .saved-header{padding:14px 16px 4px;font-size:17px;font-weight:700}
@@ -412,6 +481,35 @@ html,body{
         <div class="cats" id="catChips"></div>
       </div>
       <div class="q-list" id="qList"></div>
+
+      <!-- Footer -->
+      <div class="app-footer">
+        <div class="app-footer-sponsor">
+          <span class="app-footer-sponsor-badge">贊助單位</span>
+          信邦電子
+        </div>
+        <div class="app-footer-row">
+          <strong>計畫名稱</strong>　「信邦ESGX聯大USR」
+        </div>
+        <div class="app-footer-row">
+          <strong>執行單位</strong>　國立聯合大學 工業設計學系・文化創業與數位行銷學系・華語文中心
+        </div>
+        <div class="app-footer-row">
+          <strong>執行期間</strong>　2026/2/1 – 2028/1/31
+        </div>
+        <div class="app-footer-row"><strong>合作夥伴</strong></div>
+        <div class="app-footer-partners">
+          <span class="app-footer-tag">國立臺灣工藝研究發展中心苗栗分館</span>
+          <span class="app-footer-tag">苗栗縣文化觀光局陶瓷博物館</span>
+          <span class="app-footer-tag">五穀文化村</span>
+          <span class="app-footer-tag">金龍窯</span>
+          <span class="app-footer-tag">東億陶瓷廠</span>
+          <span class="app-footer-tag">銅鑼窯</span>
+          <span class="app-footer-tag">微光之丘／微光書旅</span>
+          <span class="app-footer-tag">中油探採事業部</span>
+          <span class="app-footer-tag">台灣油礦陳列館</span>
+        </div>
+      </div>
     </div>
 
     <!-- MAP -->
@@ -445,6 +543,14 @@ html,body{
         </div>
       </div>
       <div class="site-list" id="siteList"></div>
+      <!-- Site popup backdrop -->
+      <div class="site-popup-backdrop" id="siteBackdrop" onclick="closeSitePopup()"></div>
+      <!-- Site popup -->
+      <div class="site-popup" id="sitePopup">
+        <div class="site-popup-handle"></div>
+        <button class="site-popup-close" onclick="closeSitePopup()">✕</button>
+        <div class="site-popup-body" id="sitePopupBody"></div>
+      </div>
     </div>
 
     <!-- SAVED -->
@@ -494,12 +600,110 @@ var CATEGORIES = [
 ];
 
 var SITES = [
-  { cat:'rail', zh:'功維敘隧道 / 火車頭園區', en:'Gongweixu Tunnel & Locomotive Park',  x:46, y:38 },
-  { cat:'rail', zh:'舊山線三義–后里段',        en:'Old Mountain Line, Sanyi–Houli',       x:58, y:22 },
-  { cat:'oil',  zh:'出磺坑油田',              en:'Chusongkeng Oil Field',                x:70, y:55 },
-  { cat:'fire', zh:'中油探採事業部（苗栗）',   en:'CPC E&P Division, Miaoli',            x:44, y:44 },
-  { cat:'clay', zh:'公館陶瓷博物館',          en:'Gongguan Ceramics Museum',             x:62, y:60 },
-  { cat:'clay', zh:'銅鑼窯 / 五鼓文化村',     en:'Tongluo Kiln & Wugu Cultural Village', x:30, y:66 }
+  // ── 鐵 Rail ──
+  { cat:'rail', zh:'苗栗火車站', en:'Miaoli Railway Station',
+    x:40, y:48,
+    descZh:'建於1893年的苗栗站是縱貫鐵道上的重要節點，日治時期以磚造站體呈現仿洋式風格，見證苗栗從農業聚落蛻變為現代城市的過程。',
+    descEn:'Opened in 1893, Miaoli Station was a key node on the Western Trunk Line. Its Japanese-era brick building with Western-influenced design witnessed Miaoli\'s transformation from an agricultural settlement into a modern city.',
+    gmaps:'https://www.google.com/maps/search/苗栗火車站' },
+  { cat:'rail', zh:'功維敘隧道', en:'Gongweixu Tunnel',
+    x:46, y:38,
+    descZh:'完工於1903年的功維敘隧道是舊山線最早通車的隧道之一，磚拱工法保存完整，全長約247公尺，是台灣鐵道工程史上的珍貴遺跡，至今仍可入內參觀。',
+    descEn:'Completed in 1903, Gongweixu Tunnel is one of the Old Mountain Line\'s earliest tunnels. Its brick-arch construction remains intact across approximately 247 meters — a precious relic of Taiwan\'s railway engineering history, open to visitors.',
+    gmaps:'https://www.google.com/maps/search/功維敘隧道+苗栗' },
+  { cat:'rail', zh:'火車頭園區', en:'Locomotive Park',
+    x:48, y:41,
+    descZh:'苗栗火車頭園區戶外靜態展示多輛退役蒸汽機車與早期柴電機車，讓訪客近距離感受台灣鐵路早期動力的磅礡氣勢，是親子鐵道教育的熱門景點。',
+    descEn:'The Miaoli Locomotive Park displays retired steam and early diesel-electric locomotives in an open-air setting. Visitors can get up close to the mighty machines that once powered Taiwan\'s early railways.',
+    gmaps:'https://www.google.com/maps/search/苗栗火車頭園區' },
+  { cat:'rail', zh:'舊山線三義–后里段', en:'Old Mountain Line, Sanyi–Houli',
+    x:58, y:22,
+    descZh:'耗時五年建成的舊山線精華段，穿越大安溪谷地，含勝興車站、龍騰斷橋與大安溪橋等五大工程奇蹟。1998年新山線通車後停駛，現為熱門觀光鐵道遺跡。',
+    descEn:'The most dramatic section of the Old Mountain Line, cutting through the Daan River valley with engineering landmarks including Shengxing Station, the Dragon Pavilion Viaduct ruins, and the Daan River Bridge. Decommissioned in 1998, now a popular heritage trail.',
+    gmaps:'https://www.google.com/maps/search/勝興車站+三義' },
+  { cat:'rail', zh:'苗栗郵便局（現中苗郵局）', en:'Miaoli Post Office (est. 1902)',
+    x:42, y:46,
+    descZh:'建於日治時期的苗栗郵便局，採折衷主義建築風格，是苗栗市區現存少數保有原始立面的官廳建築之一，見證了日治至戰後苗栗城市發展的脈絡。',
+    descEn:'Built during the Japanese colonial era in eclectic architectural style, this post office is one of the few surviving government buildings in Miaoli City retaining its original façade, bearing witness to the city\'s development from colonial times through the postwar era.',
+    gmaps:'https://www.google.com/maps/search/中苗郵局+苗栗市' },
+  { cat:'rail', zh:'苗栗天后宮', en:'Miaoli Tianhou Temple',
+    x:38, y:51,
+    descZh:'創建於1811至1817年間，是苗栗市區歷史最悠久的媽祖廟，1992至1995年間重建。廟宇的發展與苗栗市街的形成密不可分，是先民拓墾信仰與常民生活的重要見證。',
+    descEn:'Founded between 1811 and 1817, this is the oldest Mazu temple in Miaoli City, rebuilt between 1992 and 1995. Its history is inseparable from the formation of Miaoli\'s urban district, testifying to the faith and daily life of the early settlers.',
+    gmaps:'https://www.google.com/maps/search/苗栗天后宮' },
+  { cat:'rail', zh:'苗栗市場（現南苗公有零售市場）', en:'Miaoli Market (South Miaoli Public Market)',
+    x:41, y:54,
+    descZh:'苗栗舊市場發展於日治時期鐵道開通後，現為南苗公有零售市場。市場周邊曾是苗栗市最繁華的商業地帶，反映出鐵道交通帶動城市聚落形成的歷史軌跡。',
+    descEn:'Miaoli\'s traditional market flourished after the railway opened during the Japanese colonial period. Now the South Miaoli Public Retail Market, it represents the city\'s most historically vibrant commercial district, shaped by railway-driven urban growth.',
+    gmaps:'https://www.google.com/maps/search/南苗公有零售市場+苗栗市' },
+  { cat:'rail', zh:'苗栗第一公校（現建功國小）', en:'First Public School (now Jiangong Elem.)',
+    x:44, y:52,
+    descZh:'苗栗地區最早設立的公學校，創立於日治初期，肩負推行現代教育的任務。現為建功國民小學，校址延續逾百年，是苗栗近代教育史的起點。',
+    descEn:'The earliest public school established in Miaoli during the early Japanese colonial period. Now Jiangong Elementary School, it has occupied the same site for over a century — the starting point of Miaoli\'s modern educational history.',
+    gmaps:'https://www.google.com/maps/search/建功國小+苗栗市' },
+  { cat:'rail', zh:'新竹製糖苗栗工場（現苗栗地方法院）', en:'Hsinchu Sugar Co. Miaoli Factory (now District Court)',
+    x:43, y:50,
+    descZh:'1917年前身為苗栗製糖組合，後改組為新竹製糖株式會社苗栗工場，以輕便鐵道運送甘蔗原料。廠址現為苗栗地方法院，輕鐵路線曾深刻影響苗栗市的地景發展。',
+    descEn:'Originally the Miaoli Sugar Cooperative before 1917, this sugar factory used light railways to transport sugarcane. The site is now Miaoli District Court; its narrow-gauge rail network once profoundly shaped the landscape of Miaoli City.',
+    gmaps:'https://www.google.com/maps/search/苗栗地方法院' },
+  // ── 油 Oil ──
+  { cat:'oil', zh:'出磺坑油田', en:'Chusongkeng Oil Field',
+    x:70, y:55,
+    descZh:'全球第二古老油田，清朝即有人工挖採記錄，日治引進頓鑽技術後躍升為正式油礦。鼎盛時期商店林立，有「小香港」美稱，至今仍由台灣中油產出少量天然氣。',
+    descEn:'The world\'s second-oldest oil field, with hand-dug extraction recorded in the Qing era. Modernized under Japanese rule, it once thrived as "Little Hong Kong." CPC still extracts small amounts of natural gas here today.',
+    gmaps:'https://www.google.com/maps/search/出磺坑+公館鄉' },
+  { cat:'oil', zh:'苗栗製油所（現北苗市場）', en:'Miaoli Oil Refinery (now N. Miaoli Market)',
+    x:37, y:44,
+    descZh:'日治時期設立的苗栗製油所，負責提煉出磺坑採出的原油，是台灣近代石油工業鏈的關鍵設施。廠區已拆除，現址為北苗市場，製油所的工業記憶僅存於舊地圖與文獻之中。',
+    descEn:'Established in the Japanese colonial era, the Miaoli Oil Refinery processed crude oil from Chusongkeng, forming a key link in Taiwan\'s early petroleum industry chain. Demolished long ago, the site is now the North Miaoli Market — its industrial memory preserved only in old maps and archives.',
+    gmaps:'https://www.google.com/maps/search/北苗市場+苗栗市' },
+  { cat:'oil', zh:'國立聯合大學二坪山校區', en:'National United University, Erpingshan Campus',
+    x:47, y:35,
+    descZh:'位於二坪山丘陵的國立聯合大學，現為地方知識研究與產學合作的重要基地，透過USR計畫積極推動台六線沿線的文化保存、工藝傳承與地方創生工作。',
+    descEn:'Set on the Erpingshan hills, National United University serves as a hub for regional knowledge research and industry-academia collaboration, actively promoting cultural preservation, craft heritage, and community revitalization along Provincial Highway 6 through USR initiatives.',
+    gmaps:'https://www.google.com/maps/search/國立聯合大學+苗栗市' },
+  // ── 火 Fire ──
+  { cat:'fire', zh:'中油探採事業部（苗栗）', en:'CPC E&P Division, Miaoli',
+    x:44, y:44,
+    descZh:'台灣石油探勘的起源地，傳承自清代出磺坑油礦一脈相承的探採技術。現為台灣中油探勘及生產事業部的主要辦公地點，近年積極推動廢棄油氣井碳封存及地熱發電。',
+    descEn:'The cradle of Taiwan\'s oil-exploration expertise, carrying on an unbroken lineage from Qing-dynasty Chusongkeng. Now the main office of CPC\'s E&P Division, it today spearheads CO₂ sequestration in depleted wells and geothermal energy development.',
+    gmaps:'https://www.google.com/maps/search/台灣中油探採事業部+苗栗' },
+  { cat:'fire', zh:'台灣油礦陳列館', en:'Taiwan Oil Mine Exhibition Hall',
+    x:72, y:52,
+    descZh:'位於出磺坑油田內的台灣油礦陳列館，系統展示台灣石油開採的百年歷史，從清朝人工鑿井到日治機械化開採，再到戰後現代鑽探技術，館內保存珍貴設備與文獻。',
+    descEn:'Located within the Chusongkeng oil field, this hall systematically documents a century of Taiwan\'s petroleum history — from Qing-dynasty hand-dug wells through Japanese-era mechanized drilling to postwar modern technology, with precious equipment and archives on display.',
+    gmaps:'https://www.google.com/maps/search/台灣油礦陳列館+公館鄉' },
+  // ── 土 Clay ──
+  { cat:'clay', zh:'苗栗公館陶瓷博物館', en:'Gongguan Ceramics Museum',
+    x:62, y:60,
+    descZh:'苗栗縣文化觀光局營運的陶瓷專題館，完整呈現苗栗陶從日治陶管、大型甕缸到1970年代外銷裝飾陶瓷的產業演變，並設有DIY體驗區。',
+    descEn:'Operated by the Miaoli County Bureau of Culture and Tourism, this museum traces the full arc of Miaoli pottery — from Japanese-era ceramic pipes and large jars to 1970s decorative-ceramic exports — with a hands-on workshop.',
+    gmaps:'https://www.google.com/maps/search/公館陶瓷博物館+苗栗' },
+  { cat:'clay', zh:'工藝中心苗栗分館', en:'NTCRI Miaoli Craft Industry Branch',
+    x:60, y:63,
+    descZh:'國立臺灣工藝研究發展中心在苗栗設立的工藝產業研發分館，結合研究、展示與教學功能，積極推廣苗栗陶瓷工藝的傳承與創新，為在地陶藝師提供技術支援與行銷平台。',
+    descEn:'The Miaoli branch of the National Taiwan Craft Research and Development Institute combines research, exhibition, and education to promote the inheritance and innovation of Miaoli\'s ceramic craft, providing local potters with technical support and a marketing platform.',
+    gmaps:'https://www.google.com/maps/search/工藝中心苗栗分館' },
+  { cat:'clay', zh:'東億陶瓷廠', en:'Dongyi Ceramics Factory',
+    x:65, y:65,
+    descZh:'公館鄉現存的活躍陶瓷工廠之一，持續生產傳統與現代風格的陶瓷器皿。東億陶瓷保留手工拉坯與窯燒的傳統技法，同時因應市場需求開發新產品，是苗栗陶瓷產業持續傳承的縮影。',
+    descEn:'One of the active ceramic factories remaining in Gongguan Township, Dongyi produces both traditional and contemporary ceramic ware. It preserves hand-throwing and kiln-firing techniques while developing new products to meet market demands — a living example of Miaoli\'s ceramic industry in continuation.',
+    gmaps:'https://www.google.com/maps/search/東億陶瓷廠+公館鄉' },
+  { cat:'clay', zh:'五穀文化村', en:'Wugu Cultural Village',
+    x:28, y:70,
+    descZh:'融合傳統農業文化與陶瓷工藝的複合式文化園區，提供陶藝體驗、農村生活展示與生態教育等多元活動。以「五穀」為名，連結土地農耕與陶土捏塑的共同根源。',
+    descEn:'A multi-faceted cultural park blending traditional agricultural culture with ceramic craft, offering pottery experiences, rural life exhibitions, and ecological education. Named for the "five grains," it connects the shared roots of land cultivation and clay shaping.',
+    gmaps:'https://www.google.com/maps/search/五穀文化村+銅鑼' },
+  { cat:'clay', zh:'金龍窯', en:'Jinlong Kiln',
+    x:68, y:62,
+    descZh:'公館鄉歷史悠久的傳統窯場，以生產大型甕缸與生活陶器聞名。金龍窯保存了苗栗陶最具代表性的厚胎手工成型技法，老師傅的技藝傳承是苗栗陶文化延續的關鍵。',
+    descEn:'A historic traditional kiln in Gongguan Township, renowned for producing large storage jars and everyday ceramics. Jinlong Kiln preserves the most representative thick-walled hand-forming techniques of Miaoli pottery — master potters\' craft transmission is key to keeping Miaoli ceramic culture alive.',
+    gmaps:'https://www.google.com/maps/search/金龍窯+公館鄉' },
+  { cat:'clay', zh:'銅鑼窯', en:'Tongluo Kiln',
+    x:30, y:66,
+    descZh:'銅鑼窯老師傅以手擠胚技法能製作容量上千公升的巨型甕缸，是苗栗陶大型器物製作傳統的活態傳承。工坊同時接受訂製與工藝體驗，讓訪客親身感受巨型陶器成形的力道與技藝。',
+    descEn:'Tongluo Kiln\'s master craftsmen hand-form jars exceeding a thousand liters in capacity — a living continuation of Miaoli pottery\'s large-vessel tradition. The workshop accepts custom orders and offers craft experiences that let visitors feel firsthand the strength and skill behind monumental ceramics.',
+    gmaps:'https://www.google.com/maps/search/銅鑼窯+銅鑼' }
 ];
 
 var SECTIONS = [
@@ -663,22 +867,45 @@ function renderMap() {
   var pinsEl = document.getElementById('mapPins');
   var listEl = document.getElementById('siteList');
 
-  pinsEl.innerHTML = SITES.map(function(site) {
+  pinsEl.innerHTML = SITES.map(function(site, i) {
     var cat = catInfo(site.cat);
     var label = lang==='zh' ? site.zh.split(' / ')[0] : site.en.split(',')[0];
-    return '<div class="map-pin" style="left:'+site.x+'%;top:'+site.y+'%">'
+    return '<div class="map-pin" style="left:'+site.x+'%;top:'+site.y+'%" onclick="openSitePopup('+i+')">'
       +'<div class="pin-bubble" style="background:'+cat.color+'"><div class="pin-icon">'+cat.icon+'</div></div>'
       +'<div class="pin-label">'+label+'</div>'
       +'</div>';
   }).join('');
 
-  listEl.innerHTML = SITES.map(function(site) {
+  listEl.innerHTML = SITES.map(function(site, i) {
     var cat = catInfo(site.cat);
-    return '<div class="site-card">'
+    return '<div class="site-card" onclick="openSitePopup('+i+')">'
       +'<div class="site-dot" style="background:'+cat.color+'"></div>'
       +'<div><div class="site-zh">'+site.zh+'</div><div class="site-en">'+site.en+'</div></div>'
       +'</div>';
   }).join('');
+}
+
+function openSitePopup(i) {
+  var site = SITES[i];
+  var cat = catInfo(site.cat);
+  var desc = lang==='zh' ? site.descZh : site.descEn;
+  var name = lang==='zh' ? site.zh : site.en;
+  var nameAlt = lang==='zh' ? site.en : site.zh;
+  var catLabel = lang==='zh' ? cat.zh : cat.en;
+  var gmapLabel = lang==='zh' ? '在 Google 地圖開啟' : 'Open in Google Maps';
+  document.getElementById('sitePopupBody').innerHTML =
+    '<div class="site-popup-cat" style="background:'+cat.color+'22;color:'+cat.color+'">'+cat.icon+' '+catLabel+'</div>'
+    +'<div class="site-popup-name">'+name+'</div>'
+    +'<div class="site-popup-name-en">'+nameAlt+'</div>'
+    +'<div class="site-popup-desc">'+desc+'</div>'
+    +'<a class="site-popup-gmap" href="'+site.gmaps+'" target="_blank" rel="noopener">📍 '+gmapLabel+'</a>';
+  document.getElementById('sitePopup').classList.add('open');
+  document.getElementById('siteBackdrop').classList.add('open');
+}
+
+function closeSitePopup() {
+  document.getElementById('sitePopup').classList.remove('open');
+  document.getElementById('siteBackdrop').classList.remove('open');
 }
 
 function renderSaved() {
