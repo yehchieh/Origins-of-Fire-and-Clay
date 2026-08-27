@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-<title>火土之源 — AI 導覽</title>
+<title>火土之源</title>
 <style>
 *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
 
@@ -16,482 +16,215 @@
   --text3:#AEAEB2;
   --border:rgba(0,0,0,0.09);
   --accent:#B54A2F;
+  --cat-color:#888;
   --safe-top:env(safe-area-inset-top,0px);
   --safe-bot:env(safe-area-inset-bottom,0px);
-  --rail:#3A7BD5;
-  --oil:#C08520;
-  --cpc:#B54A2F;
-  --clay:#7A5230;
 }
 
 html,body{
-  height:100%;
-  background:#333;
+  min-height:100%;
+  background:var(--bg);
   font-family:"PingFang TC","Microsoft JhengHei","Heiti TC",system-ui,sans-serif;
   color:var(--text);
-  overflow:hidden;
 }
 
-#app{
+.shell{
+  max-width:480px;
+  margin:0 auto;
+  min-height:100vh;
   display:flex;
   flex-direction:column;
-  height:100%;
-  max-width:430px;
-  margin:0 auto;
-  position:relative;
-  overflow:hidden;
   background:var(--bg);
-  box-shadow:0 0 60px rgba(0,0,0,0.4);
 }
 
-/* ── HEADER ── */
-.header{
-  background:var(--bg);
-  padding:calc(var(--safe-top) + 14px) 18px 14px;
+/* TOP BAR */
+.topbar{
+  padding:calc(var(--safe-top) + 14px) 18px 12px;
   display:flex;
-  align-items:flex-end;
+  align-items:center;
   justify-content:space-between;
-  flex-shrink:0;
-  z-index:10;
+  background:var(--bg);
   border-bottom:1px solid var(--border);
+  position:sticky;
+  top:0;
+  z-index:10;
 }
-.header-titles h1{
-  font-family:"Songti TC","STSong","PMingLiU","DFKai-SB",Georgia,serif;
-  font-size:22px;
+.back-btn{
+  display:flex;
+  align-items:center;
+  gap:6px;
+  color:var(--cat-color);
+  font-size:14px;
+  font-weight:600;
+  text-decoration:none;
+  padding:6px 0;
+}
+.back-arrow{font-size:18px;line-height:1}
+.site-name{
+  font-family:"Songti TC","STSong","PMingLiU",Georgia,serif;
+  font-size:16px;
   font-weight:700;
   color:var(--text);
-  line-height:1.2;
-}
-.header-titles p{
-  font-size:11px;
-  color:var(--text2);
-  margin-top:3px;
-  font-family:Georgia,"Palatino Linotype",serif;
-  letter-spacing:0.2px;
 }
 .lang-btn{
   background:var(--surface);
   border:1.5px solid var(--border);
   border-radius:20px;
-  padding:6px 15px;
+  padding:5px 13px;
   font-size:13px;
   font-weight:600;
   color:var(--accent);
   cursor:pointer;
-  flex-shrink:0;
   font-family:inherit;
-  transition:background 0.15s;
 }
-.lang-btn:active{background:var(--surface2)}
 
-/* ── TAB CONTENT ── */
-.tab-content{
+/* CONTENT */
+.content{
   flex:1;
-  overflow:hidden;
-  position:relative;
-}
-.tab-panel{
-  position:absolute;
-  inset:0;
-  overflow-y:auto;
-  -webkit-overflow-scrolling:touch;
-  opacity:0;
-  pointer-events:none;
-  transition:opacity 0.18s;
-}
-.tab-panel.active{opacity:1;pointer-events:auto}
-
-/* ── SEARCH + FILTERS ── */
-.search-area{
-  padding:12px 16px 8px;
-  position:sticky;
-  top:0;
-  background:var(--bg);
-  z-index:5;
-}
-.search-wrap{
-  position:relative;
-}
-.search-icon{
-  position:absolute;
-  left:12px;top:50%;
-  transform:translateY(-50%);
-  color:var(--text3);
-  pointer-events:none;
-  font-size:15px;
-}
-.search-input{
-  width:100%;
-  background:var(--surface);
-  border:none;
-  border-radius:12px;
-  padding:10px 14px 10px 38px;
-  font-size:15px;
-  color:var(--text);
-  outline:none;
-  box-shadow:0 1px 4px rgba(0,0,0,0.07);
-  font-family:inherit;
-}
-.search-input::placeholder{color:var(--text3)}
-
-.cats{
+  padding:28px 20px calc(var(--safe-bot) + 40px);
   display:flex;
-  gap:8px;
-  overflow-x:auto;
-  padding:10px 0 4px;
-  scrollbar-width:none;
+  flex-direction:column;
+  gap:0;
 }
-.cats::-webkit-scrollbar{display:none}
 
-.cat-chip{
-  flex-shrink:0;
-  padding:6px 14px;
+/* CATEGORY BADGE */
+.cat-badge{
+  display:inline-flex;
+  align-items:center;
+  gap:5px;
+  font-size:12px;
+  font-weight:700;
+  letter-spacing:0.4px;
+  color:var(--cat-color);
+  background:color-mix(in srgb,var(--cat-color) 10%,#fff);
   border-radius:20px;
-  font-size:13px;
-  font-weight:500;
-  cursor:pointer;
-  transition:all 0.15s;
-  white-space:nowrap;
-  user-select:none;
-}
-.cat-chip.all{
-  background:var(--surface);
-  color:var(--text2);
-  border:1.5px solid var(--border);
-}
-.cat-chip.all.active{
-  background:var(--text);
-  color:#fff;
-  border-color:var(--text);
-}
-.cat-chip.cat{
-  border:1.5px solid transparent;
+  padding:5px 12px 5px 10px;
+  margin-bottom:18px;
+  border:1.5px solid color-mix(in srgb,var(--cat-color) 22%,transparent);
 }
 
-/* ── QUESTION CARDS ── */
-.q-list{
-  padding:4px 16px 24px;
+/* QUESTION */
+.q-label{
+  font-size:11px;font-weight:700;
+  color:var(--text3);letter-spacing:0.6px;
+  text-transform:uppercase;margin-bottom:10px;
+}
+.q-main{
+  font-size:22px;font-weight:700;
+  line-height:1.45;
+  color:var(--text);
+  margin-bottom:8px;
+}
+.q-alt{
+  font-size:14px;color:var(--text2);
+  font-family:Georgia,"Palatino Linotype",serif;
+  line-height:1.6;
+  margin-bottom:28px;
+}
+
+/* DIVIDER */
+.divider{
+  height:1px;background:var(--border);
+  margin-bottom:22px;
+}
+
+/* ANSWER */
+.a-label{
+  font-size:11px;font-weight:700;
+  color:var(--text3);letter-spacing:0.6px;
+  text-transform:uppercase;margin-bottom:10px;
+}
+.a-bubble{
+  background:var(--surface);
+  border-radius:16px;
+  padding:18px 18px 16px;
+  box-shadow:0 1px 4px rgba(0,0,0,0.07);
+  margin-bottom:24px;
+  border-left:3.5px solid var(--cat-color);
+}
+.a-main{
+  font-size:16px;line-height:1.75;
+  color:var(--text);
+  margin-bottom:12px;
+}
+.a-alt{
+  font-size:13px;color:var(--text2);
+  font-family:Georgia,serif;line-height:1.65;
+  padding-top:12px;
+  border-top:1px solid var(--border);
+}
+
+/* ACTIONS */
+.actions{
   display:flex;
   flex-direction:column;
   gap:10px;
 }
-.q-card{
-  background:var(--surface);
-  border-radius:14px;
-  padding:14px 14px 12px;
-  cursor:pointer;
-  box-shadow:0 1px 3px rgba(0,0,0,0.07);
-  transition:transform 0.12s,box-shadow 0.12s;
-  border-left:3.5px solid #ccc;
-  display:flex;
-  flex-direction:column;
-  gap:5px;
-  -webkit-user-select:none;
-  user-select:none;
-}
-.q-card:active{transform:scale(0.985);box-shadow:0 1px 2px rgba(0,0,0,0.05)}
-.q-card-top{display:flex;align-items:center;justify-content:space-between;gap:8px}
-.q-card-cat{font-size:11px;font-weight:600;letter-spacing:0.4px;flex:1;min-width:0}
-.q-card-fav{font-size:16px;line-height:1;flex-shrink:0;pointer-events:none}
-.q-card-text{font-size:15px;font-weight:500;line-height:1.45;color:var(--text)}
-.q-card-sub{font-size:12px;color:var(--text2);line-height:1.4;font-family:Georgia,serif}
-
-/* ── EMPTY STATE ── */
-.empty{text-align:center;padding:60px 20px;color:var(--text2);font-size:15px}
-.empty-icon{font-size:44px;margin-bottom:14px}
-
-/* ── MAP TAB ── */
-.map-wrap{padding:12px 16px 0}
-.map-frame{
-  position:relative;
-  background:var(--surface);
-  border-radius:18px;
-  overflow:hidden;
-  box-shadow:0 2px 8px rgba(0,0,0,0.1);
-  aspect-ratio:1/1;
-}
-.map-svg{width:100%;height:100%;display:block}
-.map-pins{position:absolute;inset:0;pointer-events:none}
-.map-pin{
-  position:absolute;
-  transform:translate(-50%,-100%);
-  display:flex;
-  flex-direction:column;
-  align-items:center;
-  pointer-events:auto;
-}
-.pin-bubble{
-  width:30px;height:30px;
-  border-radius:50% 50% 50% 0;
-  transform:rotate(-45deg);
+.btn-gpt{
   display:flex;align-items:center;justify-content:center;
-  box-shadow:0 2px 8px rgba(0,0,0,0.22);
-}
-.pin-icon{transform:rotate(45deg);font-size:14px}
-.pin-label{
-  font-size:10px;font-weight:600;
-  white-space:nowrap;max-width:88px;
-  text-align:center;white-space:normal;line-height:1.2;
-  background:rgba(255,255,255,0.93);
-  border-radius:6px;padding:2px 6px;margin-top:3px;
-  color:var(--text);
-  box-shadow:0 1px 4px rgba(0,0,0,0.13);
-}
-
-.site-list{padding:12px 16px 24px;display:flex;flex-direction:column;gap:8px}
-.site-card{
-  background:var(--surface);border-radius:12px;
-  padding:12px 14px;display:flex;align-items:center;gap:12px;
-  box-shadow:0 1px 3px rgba(0,0,0,0.06);
-}
-.site-dot{width:10px;height:10px;border-radius:50%;flex-shrink:0}
-.site-zh{font-size:14px;font-weight:500}
-.site-en{font-size:12px;color:var(--text2);margin-top:2px;font-family:Georgia,serif}
-
-/* ── SAVED TAB ── */
-.saved-header{padding:14px 16px 4px;font-size:17px;font-weight:700}
-
-/* ── TAB BAR ── */
-.tab-bar{
-  display:flex;
-  background:rgba(244,239,232,0.93);
-  backdrop-filter:blur(20px);
-  -webkit-backdrop-filter:blur(20px);
-  border-top:1px solid var(--border);
-  padding:8px 0 calc(var(--safe-bot) + 4px);
-  flex-shrink:0;
-}
-.tab-item{
-  flex:1;display:flex;flex-direction:column;
-  align-items:center;gap:3px;cursor:pointer;
-  padding:4px 0;user-select:none;
-}
-.tab-icon{font-size:22px;line-height:1}
-.tab-label{font-size:10px;font-weight:500;color:var(--text3);transition:color 0.15s}
-.tab-item.active .tab-label{color:var(--accent)}
-
-/* ── DETAIL SHEET ── */
-.backdrop{
-  position:absolute;inset:0;
-  background:rgba(0,0,0,0.42);
-  opacity:0;pointer-events:none;
-  transition:opacity 0.28s;z-index:20;
-}
-.backdrop.open{opacity:1;pointer-events:auto}
-
-.sheet{
-  position:absolute;bottom:0;left:0;right:0;
-  background:var(--surface);
-  border-radius:22px 22px 0 0;
-  z-index:21;
-  transform:translateY(100%);
-  transition:transform 0.36s cubic-bezier(0.32,0.72,0,1);
-  max-height:90%;
-  display:flex;flex-direction:column;
-}
-.sheet.open{transform:translateY(0)}
-
-.sheet-handle{
-  width:36px;height:4px;
-  background:var(--text3);border-radius:2px;
-  margin:12px auto 0;flex-shrink:0;
-}
-.sheet-body{
-  flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch;
-  padding:16px 20px calc(var(--safe-bot) + 24px);
-}
-
-.sheet-cat-row{font-size:11px;font-weight:700;letter-spacing:0.5px;margin-bottom:10px}
-.sheet-q{font-size:19px;font-weight:700;line-height:1.45;margin-bottom:6px}
-.sheet-q-alt{
-  font-size:13px;color:var(--text2);
-  font-family:Georgia,serif;line-height:1.5;
-  margin-bottom:18px;
-}
-.divider{height:1px;background:var(--border);margin:14px 0}
-.ans-label{
-  font-size:11px;font-weight:700;color:var(--text3);
-  letter-spacing:0.6px;text-transform:uppercase;margin-bottom:8px;
-}
-.ans-zh{font-size:15px;line-height:1.75;color:var(--text)}
-.ans-en{
-  font-size:13px;color:var(--text2);
-  font-family:Georgia,serif;line-height:1.65;
-  margin-top:10px;
-}
-
-.sheet-actions{display:flex;gap:10px;margin-top:22px;flex-wrap:wrap}
-.btn-chatgpt{
-  flex:1;
+  gap:10px;
   background:#19C37D;color:#fff;
-  border:none;border-radius:12px;
-  padding:13px 16px;
-  font-size:14px;font-weight:600;
-  cursor:pointer;
-  display:flex;align-items:center;justify-content:center;gap:8px;
-  font-family:inherit;
-  min-width:0;
+  border:none;border-radius:14px;
+  padding:16px 20px;
+  font-size:16px;font-weight:600;
+  cursor:pointer;font-family:inherit;
+  text-decoration:none;
+  transition:opacity 0.15s;
 }
-.btn-chatgpt:active{opacity:0.85}
-.btn-copy{
-  background:var(--surface2);
+.btn-gpt:active{opacity:0.85}
+.btn-gpt-icon{font-size:20px}
+.btn-browse{
+  display:flex;align-items:center;justify-content:center;
+  gap:8px;
+  background:var(--surface);
   border:1.5px solid var(--border);
-  border-radius:12px;
-  padding:13px 16px;
-  font-size:14px;font-weight:600;
-  cursor:pointer;color:var(--text);
-  font-family:inherit;
+  border-radius:14px;
+  padding:14px 20px;
+  font-size:15px;font-weight:600;
+  cursor:pointer;font-family:inherit;
+  color:var(--text2);
+  text-decoration:none;
+  transition:background 0.15s;
 }
-.btn-copy:active{opacity:0.8}
-.btn-fav{
-  background:var(--surface2);
-  border:1.5px solid var(--border);
-  border-radius:12px;
-  padding:13px;font-size:20px;
-  cursor:pointer;line-height:1;
-}
-.btn-fav:active{transform:scale(0.9)}
+.btn-browse:active{background:var(--surface2)}
 
-/* ── TOAST ── */
-.toast{
-  position:absolute;
-  bottom:calc(83px + 12px);left:50%;
-  transform:translateX(-50%) translateY(16px);
-  background:rgba(28,28,30,0.88);
-  color:#fff;padding:9px 20px;
-  border-radius:20px;font-size:13px;
-  white-space:nowrap;opacity:0;
-  transition:opacity 0.2s,transform 0.2s;
-  z-index:30;pointer-events:none;
+/* NOT FOUND */
+.not-found{
+  text-align:center;
+  padding:80px 24px;
+  color:var(--text2);
 }
-.toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+.not-found-icon{font-size:48px;margin-bottom:16px}
 
-/* Desktop: show as phone frame */
-@media(min-width:500px){
-  html,body{height:100%;overflow:hidden;background:#1e1a16}
-  body{display:flex;align-items:center;justify-content:center}
-  #app{
-    width:390px;
-    max-width:390px;
-    height:min(844px,92vh);
-    border-radius:44px;
-    box-shadow:0 0 0 2px rgba(255,255,255,0.08),0 32px 80px rgba(0,0,0,0.7);
-    overflow:hidden;
-  }
+/* color-mix fallback for older Safari */
+@supports not (color:color-mix(in srgb,red 10%,#fff)){
+  .cat-badge{background:rgba(136,136,136,0.1);border-color:rgba(136,136,136,0.2)}
+  .a-bubble{}
 }
 </style>
 </head>
 <body>
-<div id="app">
-
-  <div class="header">
-    <div class="header-titles">
-      <h1>火土之源</h1>
-      <p>Origins of Fire and Clay — AI 導覽</p>
-    </div>
+<div class="shell">
+  <div class="topbar">
+    <a class="back-btn" id="backBtn" href="index.html">
+      <span class="back-arrow">‹</span>
+      <span id="backLabel">全部問題</span>
+    </a>
+    <span class="site-name">火土之源</span>
     <button class="lang-btn" id="langBtn" onclick="toggleLang()">EN</button>
   </div>
-
-  <div class="tab-content">
-
-    <!-- EXPLORE -->
-    <div class="tab-panel active" id="panel-explore">
-      <div class="search-area">
-        <div class="search-wrap">
-          <span class="search-icon">🔍</span>
-          <input class="search-input" id="searchInput" placeholder="搜尋問題…" oninput="onSearch(this.value)" />
-        </div>
-        <div class="cats" id="catChips"></div>
-      </div>
-      <div class="q-list" id="qList"></div>
-    </div>
-
-    <!-- MAP -->
-    <div class="tab-panel" id="panel-map">
-      <div class="map-wrap">
-        <div class="map-frame">
-          <svg class="map-svg" viewBox="0 0 400 400" xmlns="http://www.w3.org/2000/svg">
-            <rect width="400" height="400" fill="#EAE4D8"/>
-            <!-- terrain layers -->
-            <path d="M0,90 Q80,60 170,80 Q260,100 340,70 Q380,55 400,65 L400,0 L0,0 Z" fill="#D6CBBA" opacity="0.55"/>
-            <path d="M0,300 Q70,280 140,295 Q210,310 260,285 Q320,260 400,270 L400,400 L0,400 Z" fill="#CBBEA8" opacity="0.45"/>
-            <!-- river -->
-            <path d="M195,0 Q192,70 205,140 Q218,210 195,280 Q172,350 185,400" stroke="#A8C8DC" stroke-width="7" fill="none" opacity="0.55" stroke-linecap="round" stroke-linejoin="round"/>
-            <!-- subtle grid -->
-            <line x1="0" y1="100" x2="400" y2="100" stroke="#C5B9A5" stroke-width="0.6" opacity="0.5"/>
-            <line x1="0" y1="200" x2="400" y2="200" stroke="#C5B9A5" stroke-width="0.6" opacity="0.5"/>
-            <line x1="0" y1="300" x2="400" y2="300" stroke="#C5B9A5" stroke-width="0.6" opacity="0.5"/>
-            <line x1="100" y1="0" x2="100" y2="400" stroke="#C5B9A5" stroke-width="0.6" opacity="0.5"/>
-            <line x1="200" y1="0" x2="200" y2="400" stroke="#C5B9A5" stroke-width="0.6" opacity="0.5"/>
-            <line x1="300" y1="0" x2="300" y2="400" stroke="#C5B9A5" stroke-width="0.6" opacity="0.5"/>
-            <!-- mountain icons north -->
-            <path d="M340,42 L360,12 L380,42 Z" fill="#BBAF9A" opacity="0.6"/>
-            <path d="M355,42 L372,18 L390,42 Z" fill="#BBAF9A" opacity="0.5"/>
-            <path d="M20,35 L38,8 L56,35 Z" fill="#BBAF9A" opacity="0.6"/>
-            <!-- compass rose -->
-            <text x="370" y="385" font-size="11" fill="#A09078" font-family="Georgia,serif" text-anchor="middle">N↑</text>
-            <!-- label -->
-            <text x="200" y="396" text-anchor="middle" font-size="10" fill="#A09070" font-family="Georgia,serif">苗栗縣 Miaoli County</text>
-          </svg>
-          <div class="map-pins" id="mapPins"></div>
-        </div>
-      </div>
-      <div class="site-list" id="siteList"></div>
-    </div>
-
-    <!-- SAVED -->
-    <div class="tab-panel" id="panel-saved">
-      <div class="saved-header" id="savedHeader">已收藏</div>
-      <div class="q-list" id="savedList"></div>
-    </div>
-
+  <div class="content" id="content">
+    <!-- filled by JS -->
   </div>
-
-  <!-- Tab Bar -->
-  <div class="tab-bar">
-    <div class="tab-item active" id="tab-explore" onclick="switchTab('explore')">
-      <div class="tab-icon">🔍</div>
-      <div class="tab-label" id="tl-explore">探索</div>
-    </div>
-    <div class="tab-item" id="tab-map" onclick="switchTab('map')">
-      <div class="tab-icon">📍</div>
-      <div class="tab-label" id="tl-map">地圖</div>
-    </div>
-    <div class="tab-item" id="tab-saved" onclick="switchTab('saved')">
-      <div class="tab-icon">🔖</div>
-      <div class="tab-label" id="tl-saved">收藏</div>
-    </div>
-  </div>
-
-  <!-- Detail Sheet -->
-  <div class="backdrop" id="backdrop" onclick="closeSheet()"></div>
-  <div class="sheet" id="sheet">
-    <div class="sheet-handle"></div>
-    <div class="sheet-body" id="sheetBody"></div>
-  </div>
-
-  <!-- Toast -->
-  <div class="toast" id="toast"></div>
 </div>
 
 <script>
-// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-// DATA
-// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+// ─── DATA ──────────────────────────────────────────────────────────
 var CATEGORIES = [
-  { id:'rail', zh:'縱貫鐵道 / 輕便軌道', en:'Railway & Light Rail',         color:'#3A7BD5', icon:'🚂' },
-  { id:'oil',  zh:'出磺坑',              en:'Chusongkeng Oil Field',        color:'#C08520', icon:'⛽' },
-  { id:'fire', zh:'中油探採事業部',       en:'CPC Exploration Division',     color:'#B54A2F', icon:'🔥' },
-  { id:'clay', zh:'苗栗陶',              en:'Miaoli Pottery',               color:'#7A5230', icon:'🏺' }
-];
-
-var SITES = [
-  { cat:'rail', zh:'功維敘隧道 / 火車頭園區', en:'Gongweixu Tunnel & Locomotive Park',  x:46, y:38 },
-  { cat:'rail', zh:'舊山線三義–后里段',        en:'Old Mountain Line, Sanyi–Houli',       x:58, y:22 },
-  { cat:'oil',  zh:'出磺坑油田',              en:'Chusongkeng Oil Field',                x:70, y:55 },
-  { cat:'fire', zh:'中油探採事業部（苗栗）',   en:'CPC E&P Division, Miaoli',            x:44, y:44 },
-  { cat:'clay', zh:'公館陶瓷博物館',          en:'Gongguan Ceramics Museum',             x:62, y:60 },
-  { cat:'clay', zh:'銅鑼窯 / 五鼓文化村',     en:'Tongluo Kiln & Wugu Cultural Village', x:30, y:66 }
+  { id:'rail', zh:'縱貫鐵道 / 輕便軌道', en:'Railway & Light Rail',     color:'#3A7BD5', icon:'🚂' },
+  { id:'oil',  zh:'出磺坑',              en:'Chusongkeng Oil Field',    color:'#C08520', icon:'⛽' },
+  { id:'fire', zh:'中油探採事業部',       en:'CPC Exploration Division', color:'#B54A2F', icon:'🔥' },
+  { id:'clay', zh:'苗栗陶',              en:'Miaoli Pottery',           color:'#7A5230', icon:'🏺' }
 ];
 
 var SECTIONS = [
@@ -548,23 +281,11 @@ var SECTIONS = [
   ]}
 ];
 
-// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-// STATE
-// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-var lang = 'zh';
-var activeTab = 'explore';
-var activeCat = 'all';
-var searchTerm = '';
-var selectedQ = null;
-var favorites;
-try { favorites = new Set(JSON.parse(localStorage.getItem('huotu-favs')||'[]')); }
-catch(e) { favorites = new Set(); }
-
-// Flatten with IDs
-var ALL_Q = [];
+// ─── FLATTEN ──────────────────────────────────────────────────────
+var ALL_Q = {};
 SECTIONS.forEach(function(sec) {
   sec.questions.forEach(function(q, i) {
-    ALL_Q.push(Object.assign({ id: sec.id+'_'+i, cat: sec.id }, q));
+    ALL_Q[sec.id+'_'+i] = Object.assign({ cat: sec.id }, q);
   });
 });
 
@@ -572,224 +293,88 @@ function catInfo(id) {
   return CATEGORIES.find(function(c){ return c.id===id; }) || { color:'#888', icon:'❓', zh:id, en:id };
 }
 
-// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-// RENDER
-// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-function renderAll() {
-  renderChips();
-  renderQList();
-  renderMap();
-  renderSaved();
-  renderTabLabels();
-}
+// ─── STATE ────────────────────────────────────────────────────────
+var lang = 'zh';
+var currentQ = null;
+var currentId = null;
 
-function renderTabLabels() {
-  document.getElementById('tl-explore').textContent = lang==='zh' ? '探索' : 'Explore';
-  document.getElementById('tl-map').textContent     = lang==='zh' ? '地圖' : 'Map';
-  document.getElementById('tl-saved').textContent   = lang==='zh' ? '收藏' : 'Saved';
-  document.getElementById('savedHeader').textContent = lang==='zh' ? '已收藏' : 'Saved';
-  document.getElementById('searchInput').placeholder = lang==='zh' ? '搜尋問題…' : 'Search questions…';
-  document.getElementById('langBtn').textContent = lang==='zh' ? 'EN' : '中文';
-  document.documentElement.lang = lang==='zh' ? 'zh-TW' : 'en';
-}
-
-function renderChips() {
-  var html = '<div class="cat-chip all'+(activeCat==='all'?' active':'')+'" onclick="setCat(\'all\')">'
-    +(lang==='zh' ? '全部' : 'All')+'</div>';
-  CATEGORIES.forEach(function(c) {
-    var isActive = activeCat===c.id;
-    var label = lang==='zh' ? c.zh.split(' / ')[0] : c.en.split(' ')[0];
-    html += '<div class="cat-chip cat'+(isActive?' active':'')+'" '
-      +'style="background:'+(isActive ? c.color : 'rgba('+hexRGB(c.color)+',0.12)')
-      +';color:'+(isActive ? '#fff' : c.color)
-      +';border-color:'+(isActive ? c.color : 'rgba('+hexRGB(c.color)+',0.28)')+'"'
-      +' onclick="setCat(\''+c.id+'\')">'+c.icon+' '+label+'</div>';
-  });
-  document.getElementById('catChips').innerHTML = html;
-}
-
-function hexRGB(hex) {
-  var r=parseInt(hex.slice(1,3),16), g=parseInt(hex.slice(3,5),16), b=parseInt(hex.slice(5,7),16);
-  return r+','+g+','+b;
-}
-
-function filteredQ() {
-  return ALL_Q.filter(function(q) {
-    if (activeCat!=='all' && q.cat!==activeCat) return false;
-    if (searchTerm) {
-      var s = searchTerm.toLowerCase();
-      return q.zh.toLowerCase().includes(s) || q.en.toLowerCase().includes(s)
-          || q.azh.toLowerCase().includes(s) || q.aen.toLowerCase().includes(s);
-    }
-    return true;
-  });
-}
-
-function qCardHTML(q) {
+// ─── RENDER ───────────────────────────────────────────────────────
+function render() {
+  var id = currentId;
+  var q  = currentQ;
   var cat = catInfo(q.cat);
-  var isFav = favorites.has(q.id);
-  var mainText = lang==='zh' ? q.zh : q.en;
-  var subText  = lang==='zh' ? q.en : q.zh;
-  return '<div class="q-card" style="border-color:'+cat.color+'" onclick="openSheet(\''+q.id+'\')">'
-    +'<div class="q-card-top">'
-    +'<div class="q-card-cat" style="color:'+cat.color+'">'+cat.icon+' '+(lang==='zh'?cat.zh:cat.en)+'</div>'
-    +'<div class="q-card-fav">'+(isFav?'❤️':'🤍')+'</div>'
+  var color = cat.color;
+
+  // Apply cat color to CSS var
+  document.documentElement.style.setProperty('--cat-color', color);
+
+  var mainQ = lang==='zh' ? q.zh  : q.en;
+  var altQ  = lang==='zh' ? q.en  : q.zh;
+  var mainA = lang==='zh' ? q.azh : q.aen;
+  var altA  = lang==='zh' ? q.aen : q.azh;
+  var catLabel = lang==='zh' ? cat.zh : cat.en;
+
+  var gptText = lang==='zh' ? q.zh : q.en;
+  var gptUrl  = 'https://chatgpt.com/?q=' + encodeURIComponent(gptText);
+
+  document.getElementById('backLabel').textContent = lang==='zh' ? '全部問題' : 'All questions';
+  document.getElementById('langBtn').textContent   = lang==='zh' ? 'EN' : '中文';
+  document.documentElement.lang = lang==='zh' ? 'zh-TW' : 'en';
+
+  document.getElementById('content').innerHTML =
+    '<div class="cat-badge">'+cat.icon+' '+catLabel+'</div>'
+
+    +'<div class="q-label">'+(lang==='zh' ? '展覽問題' : 'Exhibition Question')+'</div>'
+    +'<div class="q-main">'+mainQ+'</div>'
+    +'<div class="q-alt">'+altQ+'</div>'
+
+    +'<div class="divider"></div>'
+
+    +'<div class="a-label">'+(lang==='zh' ? '簡要解答' : 'Quick Answer')+'</div>'
+    +'<div class="a-bubble">'
+    +'<div class="a-main">'+mainA+'</div>'
+    +'<div class="a-alt">'+altA+'</div>'
     +'</div>'
-    +'<div class="q-card-text">'+mainText+'</div>'
-    +'<div class="q-card-sub">'+subText+'</div>'
+
+    +'<div class="actions">'
+    +'<a class="btn-gpt" href="'+gptUrl+'" target="_blank" rel="noopener">'
+    +'<span class="btn-gpt-icon">🤖</span>'
+    +(lang==='zh' ? '用 ChatGPT 深入探索這個問題' : 'Explore further with ChatGPT')
+    +'</a>'
+    +'<a class="btn-browse" href="index.html">'
+    +'&#8592; '+(lang==='zh' ? '返回瀏覽全部 43 道問題' : 'Browse all 43 questions')
+    +'</a>'
     +'</div>';
 }
 
-function renderQList() {
-  var el = document.getElementById('qList');
-  var qs = filteredQ();
-  if (!qs.length) {
-    el.innerHTML = '<div class="empty"><div class="empty-icon">🔍</div>'
-      +(lang==='zh'?'找不到相關問題':'No questions found')+'</div>';
-    return;
-  }
-  el.innerHTML = qs.map(qCardHTML).join('');
-}
-
-function renderMap() {
-  var pinsEl = document.getElementById('mapPins');
-  var listEl = document.getElementById('siteList');
-
-  pinsEl.innerHTML = SITES.map(function(site) {
-    var cat = catInfo(site.cat);
-    var label = lang==='zh' ? site.zh.split(' / ')[0] : site.en.split(',')[0];
-    return '<div class="map-pin" style="left:'+site.x+'%;top:'+site.y+'%">'
-      +'<div class="pin-bubble" style="background:'+cat.color+'"><div class="pin-icon">'+cat.icon+'</div></div>'
-      +'<div class="pin-label">'+label+'</div>'
-      +'</div>';
-  }).join('');
-
-  listEl.innerHTML = SITES.map(function(site) {
-    var cat = catInfo(site.cat);
-    return '<div class="site-card">'
-      +'<div class="site-dot" style="background:'+cat.color+'"></div>'
-      +'<div><div class="site-zh">'+site.zh+'</div><div class="site-en">'+site.en+'</div></div>'
-      +'</div>';
-  }).join('');
-}
-
-function renderSaved() {
-  var el = document.getElementById('savedList');
-  var saved = ALL_Q.filter(function(q){ return favorites.has(q.id); });
-  if (!saved.length) {
-    el.innerHTML = '<div class="empty"><div class="empty-icon">🔖</div>'
-      +(lang==='zh'?'點擊問題卡片的 ♡ 收藏問題':'Tap ♡ on any question to save it')+'</div>';
-    return;
-  }
-  el.innerHTML = saved.map(qCardHTML).join('');
-}
-
-// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-// INTERACTIONS
-// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-function switchTab(tab) {
-  activeTab = tab;
-  document.querySelectorAll('.tab-panel').forEach(function(p){ p.classList.remove('active'); });
-  document.querySelectorAll('.tab-item').forEach(function(t){ t.classList.remove('active'); });
-  document.getElementById('panel-'+tab).classList.add('active');
-  document.getElementById('tab-'+tab).classList.add('active');
-  if (tab==='saved') renderSaved();
+function renderNotFound() {
+  document.getElementById('content').innerHTML =
+    '<div class="not-found">'
+    +'<div class="not-found-icon">🔍</div>'
+    +'<div>找不到這道問題<br><small style="color:var(--text3)">Question not found</small></div>'
+    +'<br><a class="btn-browse" href="index.html" style="display:inline-flex;margin-top:12px">← 返回全部問題</a>'
+    +'</div>';
 }
 
 function toggleLang() {
   lang = lang==='zh' ? 'en' : 'zh';
-  renderAll();
-  if (selectedQ) renderSheetContent();
+  if (currentQ) render(); else renderNotFound();
 }
 
-function setCat(cat) {
-  activeCat = cat;
-  renderChips();
-  renderQList();
-}
+// ─── INIT ─────────────────────────────────────────────────────────
+(function() {
+  try {
+    var params = new URLSearchParams(window.location.search);
+    currentId = params.get('id') || params.get('q');
+  } catch(e) {}
 
-function onSearch(val) {
-  searchTerm = val;
-  renderQList();
-}
-
-function openSheet(qid) {
-  selectedQ = ALL_Q.find(function(q){ return q.id===qid; });
-  if (!selectedQ) return;
-  renderSheetContent();
-  document.getElementById('backdrop').classList.add('open');
-  document.getElementById('sheet').classList.add('open');
-}
-
-function closeSheet() {
-  document.getElementById('backdrop').classList.remove('open');
-  document.getElementById('sheet').classList.remove('open');
-}
-
-function renderSheetContent() {
-  if (!selectedQ) return;
-  var q = selectedQ;
-  var cat = catInfo(q.cat);
-  var isFav = favorites.has(q.id);
-  var mainQ  = lang==='zh' ? q.zh  : q.en;
-  var altQ   = lang==='zh' ? q.en  : q.zh;
-  var mainA  = lang==='zh' ? q.azh : q.aen;
-  var altA   = lang==='zh' ? q.aen : q.azh;
-
-  document.getElementById('sheetBody').innerHTML =
-    '<div class="sheet-cat-row" style="color:'+cat.color+'">'+cat.icon+' '+(lang==='zh'?cat.zh:cat.en)+'</div>'
-    +'<div class="sheet-q">'+mainQ+'</div>'
-    +'<div class="sheet-q-alt">'+altQ+'</div>'
-    +'<div class="divider"></div>'
-    +'<div class="ans-label">'+(lang==='zh'?'簡要解答 · Quick Answer':'Quick Answer · 簡要解答')+'</div>'
-    +'<div class="ans-zh">'+mainA+'</div>'
-    +'<div class="ans-en">'+altA+'</div>'
-    +'<div class="sheet-actions">'
-    +'<button class="btn-chatgpt" onclick="openGPT()">🤖 '+(lang==='zh'?'用 ChatGPT 深入問':'Ask ChatGPT')+'</button>'
-    +'<button class="btn-copy" onclick="copyQ()">'+(lang==='zh'?'複製':'Copy')+'</button>'
-    +'<button class="btn-fav" onclick="toggleFav(\''+q.id+'\')">'+(isFav?'❤️':'🤍')+'</button>'
-    +'</div>';
-}
-
-function openGPT() {
-  if (!selectedQ) return;
-  var text = lang==='zh' ? selectedQ.zh : selectedQ.en;
-  window.open('https://chatgpt.com/?q='+encodeURIComponent(text), '_blank');
-}
-
-function copyQ() {
-  if (!selectedQ) return;
-  var text = lang==='zh' ? selectedQ.zh : selectedQ.en;
-  if (navigator.clipboard) {
-    navigator.clipboard.writeText(text).catch(function(){});
-  }
-  showToast(lang==='zh' ? '已複製！' : 'Copied!');
-}
-
-function toggleFav(qid) {
-  if (favorites.has(qid)) {
-    favorites.delete(qid);
-    showToast(lang==='zh' ? '已移除收藏' : 'Removed from saved');
+  if (currentId && ALL_Q[currentId]) {
+    currentQ = ALL_Q[currentId];
+    render();
   } else {
-    favorites.add(qid);
-    showToast(lang==='zh' ? '已加入收藏 ❤️' : 'Saved ❤️');
+    renderNotFound();
   }
-  try { localStorage.setItem('huotu-favs', JSON.stringify(Array.from(favorites))); } catch(e){}
-  renderSheetContent();
-  renderQList();
-  if (activeTab==='saved') renderSaved();
-}
-
-function showToast(msg) {
-  var el = document.getElementById('toast');
-  el.textContent = msg;
-  el.classList.add('show');
-  clearTimeout(el._t);
-  el._t = setTimeout(function(){ el.classList.remove('show'); }, 2000);
-}
-
-// ── INIT ──
-renderAll();
+})();
 </script>
 </body>
 </html>
